@@ -1,0 +1,7 @@
+# Auto Configuration
+#org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+#io.kryptoblocks.msa.common.CommonConfig
+
+# Environment Post Processor
+#org.springframework.boot.env.EnvironmentPostProcessor=\
+#org.springframework.cloud.sleuth.stream.StreamEnvironmentPostProcessor

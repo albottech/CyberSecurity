@@ -1,0 +1,18 @@
+STORAGE:
+    AUTO:
+        COMPACT: true
+    DISK:
+        PRIMARY:
+            LOCATION: /data-cache/storage/primary/location/
+            LOCATION.SIZE: 20
+        SECONDARY:
+            LOCATION: /data-cache/storage/secondary/location/
+            LOCATION.SIZE: 20
+    MAX:
+        OPERATION:
+            LOG:
+                SIZE: 10
+    QUEUE:
+        SIZE: 50
+    TIME:
+        INTERVAL: 9999

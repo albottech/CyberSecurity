@@ -1,0 +1,5 @@
+package io.kryptoblocks.msa.network.stream.service.business;
+
+public interface NetworkSaveDataElasticSearch {
+		private void saveDatatoElasticSearch();
+}

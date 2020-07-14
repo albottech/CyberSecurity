@@ -1,0 +1,16 @@
+server:
+  context-path: /securityService
+log:
+  path:
+    txt:
+      location: /log/
+      file:
+        name: security-service-txt-log.txt
+    json:
+      location: /log/
+      file:
+        name: security-service-json-log.json
+    
+      
+      
+      

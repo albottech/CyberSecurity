@@ -1,0 +1,11 @@
+version: '3'
+services:
+  gateway-service:
+    build: .
+    ports:
+     - "8100:8100"
+     
+networks:
+  default:
+    external:
+      name: smartride-msa-network

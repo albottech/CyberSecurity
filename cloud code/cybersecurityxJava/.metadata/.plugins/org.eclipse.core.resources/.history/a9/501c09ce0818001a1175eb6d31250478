@@ -1,0 +1,70 @@
+package io.kryptoblocks.msa.network.stream.service.business.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.kryptoblocks.msa.network.repository.model.NetworkDataSourcingModel;
+import io.kryptoblocks.msa.network.stream.service.ElasticSearch.NetworkSourcingModelElasticSearch;
+import io.kryptoblocks.msa.network.stream.service.business.NetworkSaveDataElasticSearch;
+
+
+
+public class NetworkSaveDataElasticSearchImpl implements NetworkSaveDataElasticSearch{
+	
+	ObjectMapper objectMapper = new ObjectMapper();
+	
+	//For elastic search
+	@Autowired
+	private RestHighLevelClient restClient;
+	
+	/** The Constant LOGGER. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(NetworkSaveDataElasticSearchImpl.class);
+	
+	
+	@Override
+	public void saveDatatoElasticSearch(List<NetworkSourcingModelElasticSearch> siemNetworkDataSourcingModelListES) {
+		//saving to the ElasticSearch
+		for(NetworkSourcingModelElasticSearch model : siemNetworkDataSourcingModelListES) {						  
+		
+		   try {    
+			   
+			  String jsonString = objectMapper.writeValueAsString(model);
+			 
+			  LOGGER.info("saving data to elastic search jsonString {}", jsonString); 
+			  //IndexRequest indexRequest = new IndexRequest("kryptoblocks_networksourcedata")
+					  // .source(convertObjectToMap(model),XContentType.JSON);
+			  IndexRequest indexRequest = new IndexRequest("kryptoblocks_networksourcedata").source(jsonString, XContentType.JSON);				
+	 		   //Synchronous execution
+	 		   IndexResponse indexResponse = restClient.index(indexRequest, RequestOptions.DEFAULT);
+			   LOGGER.info("index response{}",indexResponse.getResult().name());
+ 		     }
+ 		     catch(ElasticsearchException e) {			 		       
+ 		    	 LOGGER.info("in NetworkDataLandingListenerServiceImpl ElasticsearchException{}",e);
+ 		     }
+		     catch(Exception e) {
+		    	 LOGGER.info("in NetworkDataLandingListenerServiceImpl exception{}",e);
+		      }
+						
+			}
+
+		
+	}
+	
+	
+	private Map<String, Object> convertObjectToMap(NetworkDataSourcingModel model) {
+		return objectMapper.convertValue(model, Map.class);
+	}
+
+}

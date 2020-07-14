@@ -1,0 +1,15 @@
+
+https://www.tutorialspoint.com/flask/index.htm
+
+flask application
+https://www.geeksforgeeks.org/flask-creating-first-simple-application/
+
+restapi try doing POST as well
+https://www.geeksforgeeks.org/python-build-a-rest-api-using-flask/
+
+Problems:
+1. Accept two integer values from the user and return their product.
+
+2. Reverse a given number and return true if it is the same as the original number.
+
+3 . Given a list of numbers, Iterate it and print only those numbers which are divisible of 5.

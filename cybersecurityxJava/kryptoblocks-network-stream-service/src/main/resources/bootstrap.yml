@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: network-stream-service
+  cloud:
+    config:
+      uri: http://localhost:9000/configService
+      fail-fast: true
+    
+server:
+  context-path: /networkStreamService  
+  port: 9100
+  

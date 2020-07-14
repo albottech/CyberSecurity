@@ -1,0 +1,46 @@
+zuul:
+  ignoredServices: '*'
+  host:
+    connect-timeout-millis: 30000
+    socket-timeout-millis: 30000
+
+  routes:    
+    business-service:
+        path: /businessService/**
+        serviceId: business-service
+        stripPrefix: false
+        sensitiveHeaders:        
+    security-service:
+        path: /securityService/**         
+        serviceId: security-service
+        stripPrefix: false
+        sensitiveHeaders:
+    config-service:
+        path: /configService/**
+        serviceId: config-service
+        stripPrefix: false
+        sensitiveHeaders:
+    notification-service:
+        path: /notificationService/**
+        serviceId: notification-service
+        stripPrefix: false
+        sensitiveHeaders:
+
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
+  eureka:
+    enabled: false
+  
+
+business-service:
+  ribbon:
+    listOfServers: localhost:7020
+security-service:
+  ribbon:
+    listOfServers: localhost:9090
+config-service:
+  ribbon:
+    listOfServers: localhost:9000
+  
+

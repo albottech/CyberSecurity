@@ -1,0 +1,5 @@
+package io.kryptoblocks.msa.network.stream.service.business.impl;
+
+public class NetworkSaveDataElasticSearchImpl implements NetworkSaveDataElasticSearch{
+
+}

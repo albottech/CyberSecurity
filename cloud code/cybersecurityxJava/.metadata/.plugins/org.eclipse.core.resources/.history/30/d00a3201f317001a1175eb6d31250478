@@ -1,0 +1,19 @@
+package io.kryptoblocks.msa.network.repository.model;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+
+import io.kryptoblocks.msa.network.repository.key.NetworkDataSourcingKey;
+
+public class NetworkSourcingModelElasticSearch {
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = 1L;
+	
+	/** The key. */
+	@EmbeddedId
+	NetworkDataSourcingKey key;
+ 
+	/** The network data sourcing bytes. */
+	@Column
+	String jsonString;
+}

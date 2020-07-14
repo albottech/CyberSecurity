@@ -1,0 +1,174 @@
+package io.kryptoblocks.msa.network.stream.service.udp;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+@Getter @Setter
+public class SIEMRecievedJSONModel{
+		
+		 @JsonProperty("source")
+	   	 private Source source;
+		 
+		 @JsonProperty("fields")
+		 private Fields fields;
+		 
+		 @JsonProperty("data")
+		 private Data data;
+		 
+		 String type; 
+		 
+		 
+		 public SIEMRecievedJSONModel(Source source, Fields fields, Data data, String type) {
+			super();
+			this.source = source;
+			this.fields = fields;
+			this.data = data;
+			this.type = type;
+		}
+
+		public SIEMRecievedJSONModel() {
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public String toString() {
+			return "SIEMRecievedJSONModel [source=" + source + ", fields=" + fields + ", data=" + data + ", type="
+					+ type + "]";
+		}
+		@Getter @Setter
+		public static class Source {
+			
+			 @JsonProperty("id")
+			 String sourceId;
+			
+			 @JsonProperty("name")
+			 String sourceName;
+			 
+			 @JsonProperty("subnet")
+			 String sourceSubnet;
+			 
+			 @JsonProperty("host")
+			 String sourceHost;
+			
+			 public Source() {
+				 
+			 }
+			 
+			public Source(String sourceId, String sourceName, String sourceSubnet, String sourceHost) {
+				super();
+				this.sourceId = sourceId;
+				this.sourceName = sourceName;
+				this.sourceSubnet = sourceSubnet;
+				this.sourceHost = sourceHost;
+			}
+			@Override
+			public String toString() {
+				return "Source [sourceId=" + sourceId + ", sourceName=" + sourceName + ", sourceSubnet=" + sourceSubnet
+						+ ", sourceHost=" + sourceHost + "]";
+			}
+			 
+			 
+		}
+		@Getter @Setter
+		static class Fields {
+			
+			public Fields() {
+				
+			}
+			
+			@Override
+			public String toString() {
+				return "Fields []";
+			}
+			 
+		 }
+		@Getter @Setter
+		public static class Data{
+				
+				@JsonProperty("sig")
+			 	private Sig sig;
+				
+				@JsonProperty("norm_sig")
+				private NormSig normSig;
+				
+				Map <String, String> dataProperties; 
+								
+				public Data() {
+					
+				}
+				
+				
+				@Override
+				public String toString() {
+					return "Data [sig=" + sig + ", normSig=" + normSig + ", dataProperties=" + dataProperties + "]";
+				}
+
+
+				public Data(Sig sig, NormSig normSig, Map<String, String> dataProperties) {
+					super();
+					this.sig = sig;
+					this.normSig = normSig;
+					this.dataProperties = dataProperties;
+				}
+
+				@Getter @Setter
+				public static class Sig {
+					
+					@JsonProperty("id")
+					private String dataSigId;
+					
+					@JsonProperty("name")
+					private String dataSigName;
+					
+					public Sig() {
+						
+					}
+					
+					public Sig(String dataSigId, String dataSigName) {
+						super();
+						this.dataSigId = dataSigId;
+						this.dataSigName = dataSigName;
+					}
+
+
+					@Override
+					public String toString() {
+						return "\n dataSigId=" + dataSigId + ",\n dataSigName=" + dataSigName;
+					}
+				}
+				@Getter @Setter
+				public static class NormSig {
+					
+					@JsonProperty("id")
+					private String dataNormSigId;
+					
+					@JsonProperty("name")
+					private String dataNormSigName;
+					
+					public NormSig() {
+						
+					}
+					
+					@Override
+					public String toString() {
+						return "\n dataNormSigId=" + dataNormSigId + ",\n dataNormSigName=" + dataNormSigName;
+					}
+
+					public NormSig(String dataNormSigId, String dataNormSigName) {
+						super();
+						this.dataNormSigId = dataNormSigId;
+						this.dataNormSigName = dataNormSigName;
+					}
+				}
+		 }
+}
+
+	
+
+

@@ -1,0 +1,369 @@
+spring:
+  application:
+    name:  stream-consumer-service1
+    instance_id:  ${random.uuid}    
+  cloud:
+    stream:
+      bindings:
+          appContainerPerformanceOutput:
+                  destination: appContainerPerformance
+                  binder: defaultBinder  
+          appContainerPerformanceInput:
+                  destination: appContainerPerformance
+                  binder: defaultBinder
+                  group: appContainerPerformanceGroup 
+          businessActivityOutput:
+                  destination: businessActivity
+                  binder: defaultBinder  
+          businessActivityInput:
+                  destination: businessActivity
+                  binder: defaultBinder
+                  group: businessActivityGroup 
+          distributedNotificationStreamMessageOutput:
+                  destination: distributedNotification
+                  binder: defaultBinder  
+          distributedNotificationStreamMessageInput:
+                  destination: distributedNotification
+                  binder: defaultBinder
+                  group: distributedNotificationGroup
+          exceptionActivityOutput:
+                  destination: exceptionActivity
+                  binder: defaultBinder  
+          exceptionActivityInput:
+                  destination: exceptionActivity
+                  binder: defaultBinder
+                  group: exceptionActivityGroup
+          infraContainerPerformanceOutput:
+                  destination: infraContainerPerformance
+                  binder: defaultBinder  
+          infraContainerPerformanceInput:
+                  destination: infraContainerPerformance
+                  binder: defaultBinder
+          notificationActivityOutput:
+                  destination: notificationActivity
+                  binder: defaultBinder  
+          notificationActivityInput:
+                  destination: notificationActivity
+                  binder: defaultBinder
+                  group: notificationActivityGroup
+          securityActivityOutput:
+                  destination: securityActivity
+                  binder: defaultBinder  
+          securityActivityInput:
+                  destination: securityActivity
+                  binder: defaultBinder
+                  group: securityActivityGroup                
+          traceActivityOutput:
+                  destination: traceActivity
+                  binder: defaultBinder  
+          traceActivityInput:
+                  destination: traceActivity
+                  binder: defaultBinder
+                  group: traceActivityGroup
+                  
+          directActivityOutput:
+                  destination: directActivity                  
+                  binder: defaultBinder 
+                  
+          directActivityInput:
+                  destination: directActivity
+                  group: directActivityGroup1
+                  binder: defaultBinder 
+                  
+           
+          directActivityPollOutput:
+                  destination: directPollActivity                  
+                  binder: defaultBinder 
+                  
+          directActivityPollInput:
+                  destination: directPollActivity
+                  group: directActivityPollGroup1
+                  binder: defaultBinder 
+                           
+      binders:
+        defaultBinder:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest     
+      rabbit:
+        bindings:
+          directActivityOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#''' 
+          directActivityInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key''' 
+          directActivityPollOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#''' 
+          directActivityPollInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key'''           
+          appContainerPerformanceInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key''' 
+          appContainerPerformanceOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#'''         
+          businessActivityInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key''' 
+          businessActivityOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#'''      
+          
+          distributedNotificationStreamMessageInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key''' 
+          distributedNotificationStreamMessageOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#'''    
+          exceptionActivityInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key''' 
+          exceptionActivityOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#''' 
+          infraContainerPerformanceInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key''' 
+          infraContainerPerformanceOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#'''  
+          notificationActivityInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key''' 
+          notificationActivityOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#'''                   
+          securityActivityInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key''' 
+          securityActivityOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#'''  
+          traceActivityInput:
+                  consumer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true            
+                    #routing-key-expression: '''key''' 
+          traceActivityOutput:
+                  producer:
+                    exchange-type:  direct 
+                    auto-bind-dlq: true
+                    recoveryInterval: 30000
+                    republishToDlq: true
+                    routing-key-expression: '''#''' 
+  sleuth:
+        sampler:
+            percentage: 1.0                                 
+      
+service:  
+  direct:
+    stream:
+      enabled:  true
+  auth:
+    jwt:
+      token : SERVICE_JWT_AUTH_TOKEN
+    kerberos:
+      ticker:
+        header: Authorization
+  metrics:
+    logger:
+      delay:
+        in:
+          seconds: 10
+  business:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true   
+  exception:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true
+  security:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true
+  bean:
+    perf:
+      activity:
+        stream:  LOG
+        file:
+          storage:  true
+        db:
+          storage:  true
+        elk:
+          storage:  true
+  app:
+    container:
+      performance:
+        activity:
+          stream:  LOG
+          file:
+            storage:  true
+          db:
+            storage:  true
+          elk:
+            storage:  true 
+  infra:
+    container:
+      performance:
+        activity:
+          stream:  LOG
+          file:
+            storage:  true
+          db:
+            storage:  true
+          elk:
+            storage:  true 
+  trace:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true
+  notification:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true
+  event:
+    handler:
+      round:
+        robbin:
+          instance:
+            count:  10      
+  ride:
+    bid:
+      mgmt:
+        enabled:
+          country: US
+          state:  FL
+        activity:
+          stream: LOG  
+jwt:
+    expiration:
+        in:
+            minutes: 60
+    header: jwt_token
+    route:
+        authentication:
+            refresh: refresh
+    secret: jwt_secret
+    
+elk:
+  enabled: false
+  cluster:
+    enabled:  false
+    name: msaElasticCluster
+  local:
+    host: localhost
+    port: 9300
+repository:
+  enabled:  true
+
+server:
+  port: 7060
+

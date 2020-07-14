@@ -1,0 +1,15 @@
+version: '3'
+
+# Shared network
+networks:
+  smartride-msa-network:
+    # Use a custom driver
+    driver: smartride-msa-driver
+    
+services:
+  direct-stream-producer-service:
+    build: .
+    ports:
+     - "7040:7040"
+    networks:
+      - smartride-msa-network

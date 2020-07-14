@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: udp-listner-service
+  cloud:
+    config:
+      uri: http://localhost:9000/configService
+      fail-fast: true
+    
+server:
+  context-path: /udpListnerService  
+  port: 9810
+  

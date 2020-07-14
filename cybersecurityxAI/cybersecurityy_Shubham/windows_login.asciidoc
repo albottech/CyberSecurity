@@ -1,0 +1,1510 @@
+
+# Window Logging Analysis
+
+[[configuration-related-to-cassandra-connector-cluster]]
+=== Configuration related to Cassandra connector & Cluster
+
+
++*In[1]:*+
+[source, ipython3]
+----
+import os 
+os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.datastax.spark:spark-cassandra-connector_2.11:2.3.0 --conf spark.cassandra.connection.host=127.0.0.1 pyspark-shell'
+----
+
+[[importing-all-the-required-packages]]
+=== Importing all the required packages
+
+
++*In[2]:*+
+[source, ipython3]
+----
+import cassandra
+import pyspark
+from pyspark.context import SparkContext
+from pyspark.sql.context import SQLContext
+from pyspark.sql.session import SparkSession
+sc = SparkContext()
+spark = SparkSession(sc)
+from pyspark.sql import SQLContext
+sqlContext = SQLContext(sc)
+----
+
+[[connecting-to-the-cluster]]
+=== Connecting to the cluster
+
+
++*In[3]:*+
+[source, ipython3]
+----
+from cassandra.cluster import Cluster
+
+cluster = Cluster(['127.0.0.1'])
+
+session = cluster.connect()
+----
+
+[[create-a-function-to-loads-and-returns-data-frame-for-a-table-including-key-space-given]]
+=== Create a Function to Loads and returns data frame for a table
+including key space given
+
+
++*In[4]:*+
+[source, ipython3]
+----
+def load_and_get_table_df(keys_space_name, table_name):
+    table_df = sqlContext.read\
+        .format("org.apache.spark.sql.cassandra")\
+        .options(table=table_name, keyspace=keys_space_name)\
+        .load()
+    return table_df
+----
+
+[[load-the-data-from-the-cassandra-table-and-keyspace]]
+=== Load the data from the cassandra table and keyspace
+
+
++*In[5]:*+
+[source, ipython3]
+----
+data = load_and_get_table_df("test", "new")
+----
+
+
++*In[6]:*+
+[source, ipython3]
+----
+data.show()
+----
+
+
++*Out[6]:*+
+----
++--------+--------------------------+-------------------+--------------------+-----------------------+----------+---------------+------------------+---------------+----+
+|event_id|authentication_orientation|authentication_type|destination_computer|destination_user_domain|logon_type|source_computer|source_user_domain|success_failure|time|
++--------+--------------------------+-------------------+--------------------+-----------------------+----------+---------------+------------------+---------------+----+
+|   70782|                    LogOff|                  ?|                C625|            C1042$@DOM1|   Network|           C625|       C1042$@DOM1|        Success| 672|
+|  962319|                     LogOn|           Kerberos|                C528|            C2396$@DOM1|   Network|          C2396|       C2396$@DOM1|        Success|9816|
+|  754005|                    LogOff|                  ?|                C586|             C610$@DOM1|   Network|           C586|        C610$@DOM1|        Success|7717|
+|   14447|                     LogOn|           Kerberos|               C1972|              U202@DOM1|   Network|          C1972|       C1972$@DOM1|        Success| 146|
+|  790607|                       TGT|                  ?|               C2247|            C2246$@DOM1|         ?|          C2247|       C2246$@DOM1|        Success|8053|
+|  399858|                     LogOn|           Kerberos|                C625|             C101$@DOM1|   Network|           C101|        C101$@DOM1|        Success|4103|
+|   11241|                    LogOff|                  ?|                C586|            C2589$@DOM1|   Network|           C586|       C2589$@DOM1|        Success| 112|
+|  572896|                     LogOn|           Kerberos|                C457|             C903$@DOM1|   Network|           C903|        C903$@DOM1|        Success|5861|
+|  438489|                     LogOn|           Kerberos|                C457|            C4923$@DOM1|   Network|          C2225|       C4923$@DOM1|        Success|4472|
+|   20636|                    LogOff|                  ?|                C586|            C3363$@DOM1|   Network|           C586|       C3363$@DOM1|        Success| 204|
+|   76352|                     LogOn|           Kerberos|                C529|            C5381$@DOM1|   Network|          C5381|       C5381$@DOM1|        Success| 727|
+|  967675|                       TGS|                  ?|                C599|             C599$@DOM1|         ?|          C1619|        C599$@DOM1|        Success|9867|
+|   40417|                    LogOff|                  ?|                C467|            C2079$@DOM1|   Network|           C467|       C2079$@DOM1|        Success| 387|
+|  485043|                    LogOff|                  ?|                C529|             C988$@DOM1|   Network|           C529|        C988$@DOM1|        Success|4955|
+|  423449|                     LogOn|               NTLM|               C1581|               U63@DOM1|   Network|          C1581|          U63@DOM1|        Success|4323|
+|  925353|                       TGT|                  ?|               C2097|            C2096$@DOM1|         ?|          C2097|       C2096$@DOM1|        Success|9441|
+|  805751|                    LogOff|                  ?|                C523|             C123$@DOM1|   Network|           C523|        C123$@DOM1|        Success|8197|
+|   22754|                       TGS|                  ?|               C1710|               U75@DOM1|         ?|          C1710|          U75@DOM1|        Success| 226|
+|  926927|                     LogOn|           Kerberos|               C1755|               U63@DOM1|   Network|          C1755|          U63@DOM1|        Success|9457|
+|  342280|                    LogOff|                  ?|                C586|             C203$@DOM1|   Network|           C586|        C203$@DOM1|        Success|3516|
++--------+--------------------------+-------------------+--------------------+-----------------------+----------+---------------+------------------+---------------+----+
+only showing top 20 rows
+
+----
+
+[[the-count-of-the-number-of-rows-in-the-dataset]]
+=== The count of the number of rows in the dataset
+
+
++*In[7]:*+
+[source, ipython3]
+----
+data.count()
+----
+
+
++*Out[7]:*+
+----1048575----
+
+[[storing-the-extracted-data-into-a-spark-dataframe]]
+=== Storing the extracted data into a spark dataframe
+
+
++*In[8]:*+
+[source, ipython3]
+----
+df1 = spark.read.format("org.apache.spark.sql.cassandra").options(table="new", keyspace="test").load()
+
+----
+
+[[the-number-of-rows-after-sending-data-to-spark]]
+=== The number of rows after sending data to spark
+
+
++*In[9]:*+
+[source, ipython3]
+----
+print (df1.count())
+----
+
+
++*Out[9]:*+
+----
+1048575
+----
+
+[[converted-the-spark-dataframe-to-pandas-to-have-a-view-of-the-dataset]]
+=== Converted the spark dataframe to pandas to have a view of the
+dataset
+
+
++*In[10]:*+
+[source, ipython3]
+----
+df=df1.toPandas()
+df
+----
+
+
++*Out[10]:*+
+----
+[width="100%",cols="10%,9%,9%,9%,9%,9%,9%,9%,9%,9%,9%",options="header",]
+|=======================================================================
+| |event_id |authentication_orientation |authentication_type
+|destination_computer |destination_user_domain |logon_type
+|source_computer |source_user_domain |success_failure |time
+|0 |70782 |LogOff |? |C625 |C1042$@DOM1 |Network |C625 |C1042$@DOM1
+|Success |672
+
+|1 |962319 |LogOn |Kerberos |C528 |C2396$@DOM1 |Network |C2396
+|C2396$@DOM1 |Success |9816
+
+|2 |754005 |LogOff |? |C586 |C610$@DOM1 |Network |C586 |C610$@DOM1
+|Success |7717
+
+|3 |14447 |LogOn |Kerberos |C1972 |U202@DOM1 |Network |C1972
+|C1972$@DOM1 |Success |146
+
+|4 |790607 |TGT |? |C2247 |C2246$@DOM1 |? |C2247 |C2246$@DOM1 |Success
+|8053
+
+|5 |399858 |LogOn |Kerberos |C625 |C101$@DOM1 |Network |C101 |C101$@DOM1
+|Success |4103
+
+|6 |11241 |LogOff |? |C586 |C2589$@DOM1 |Network |C586 |C2589$@DOM1
+|Success |112
+
+|7 |572896 |LogOn |Kerberos |C457 |C903$@DOM1 |Network |C903 |C903$@DOM1
+|Success |5861
+
+|8 |438489 |LogOn |Kerberos |C457 |C4923$@DOM1 |Network |C2225
+|C4923$@DOM1 |Success |4472
+
+|9 |20636 |LogOff |? |C586 |C3363$@DOM1 |Network |C586 |C3363$@DOM1
+|Success |204
+
+|10 |76352 |LogOn |Kerberos |C529 |C5381$@DOM1 |Network |C5381
+|C5381$@DOM1 |Success |727
+
+|11 |967675 |TGS |? |C599 |C599$@DOM1 |? |C1619 |C599$@DOM1 |Success
+|9867
+
+|12 |40417 |LogOff |? |C467 |C2079$@DOM1 |Network |C467 |C2079$@DOM1
+|Success |387
+
+|13 |485043 |LogOff |? |C529 |C988$@DOM1 |Network |C529 |C988$@DOM1
+|Success |4955
+
+|14 |423449 |LogOn |NTLM |C1581 |U63@DOM1 |Network |C1581 |U63@DOM1
+|Success |4323
+
+|15 |925353 |TGT |? |C2097 |C2096$@DOM1 |? |C2097 |C2096$@DOM1 |Success
+|9441
+
+|16 |805751 |LogOff |? |C523 |C123$@DOM1 |Network |C523 |C123$@DOM1
+|Success |8197
+
+|17 |22754 |TGS |? |C1710 |U75@DOM1 |? |C1710 |U75@DOM1 |Success |226
+
+|18 |926927 |LogOn |Kerberos |C1755 |U63@DOM1 |Network |C1755 |U63@DOM1
+|Success |9457
+
+|19 |342280 |LogOff |? |C586 |C203$@DOM1 |Network |C586 |C203$@DOM1
+|Success |3516
+
+|20 |548932 |LogOn |Kerberos |C586 |C585$@DOM1 |Network |C585
+|C585$@DOM1 |Success |5610
+
+|21 |534938 |LogOn |Kerberos |C528 |C2610$@DOM1 |Network |C2610
+|C2610$@DOM1 |Success |5460
+
+|22 |456662 |LogOff |? |C528 |C2149$@DOM1 |Network |C528 |C2149$@DOM1
+|Success |4649
+
+|23 |164569 |LogOn |Kerberos |C101 |C599$@DOM1 |Network |C1619
+|C599$@DOM1 |Success |1638
+
+|24 |433615 |LogOn |Kerberos |C586 |C2567$@DOM1 |Network |C2567
+|C2567$@DOM1 |Success |4424
+
+|25 |679023 |LogOff |? |C586 |C2694$@DOM1 |Network |C586 |C2694$@DOM1
+|Success |6977
+
+|26 |939510 |TGT |? |C2224 |C2223$@DOM1 |? |C2224 |C2223$@DOM1 |Success
+|9584
+
+|27 |777791 |LogOff |? |C101 |C567$@DOM1 |Network |C101 |C567$@DOM1
+|Success |7935
+
+|28 |606028 |TGS |? |C3881 |C3881$@DOM1 |? |C3882 |C3881$@DOM1 |Success
+|6196
+
+|29 |652267 |LogOff |? |C625 |C4219$@DOM1 |Network |C625 |C4219$@DOM1
+|Success |6698
+
+|... |... |... |... |... |... |... |... |... |... |...
+
+|1048545 |91469 |LogOn |Kerberos |C625 |C480$@DOM1 |Network |C480
+|C480$@DOM1 |Success |880
+
+|1048546 |233817 |TGS |? |C467 |C553$@DOM1 |? |C553 |C553$@DOM1 |Success
+|2377
+
+|1048547 |913135 |AuthMap |? |C1558 |C1558$@DOM1 |? |C1558 |C1558$@DOM1
+|Success |9306
+
+|1048548 |10837 |LogOn |Kerberos |C528 |C1717$@DOM1 |Network |C1717
+|C1717$@DOM1 |Success |107
+
+|1048549 |93252 |LogOff |? |C612 |C5540$@DOM1 |Network |C612
+|C5540$@DOM1 |Success |897
+
+|1048550 |427243 |TGS |? |TGT |C2319$@DOM1 |? |C2320 |C2319$@DOM1
+|Success |4362
+
+|1048551 |609811 |LogOff |? |C612 |ANONYMOUS LOGON@C612 |Network |C612
+|ANONYMOUS LOGON@C612 |Success |6239
+
+|1048552 |604245 |LogOff |? |C1964 |U118@DOM1 |Network |C1964 |U118@DOM1
+|Success |6179
+
+|1048553 |819 |LogOn |Kerberos |C92 |U7@DOM1 |Network |C92 |U6@DOM1
+|Success |2
+
+|1048554 |818727 |LogOn |Kerberos |C612 |C1260$@DOM1 |Network |C1260
+|C1260$@DOM1 |Success |8341
+
+|1048555 |1042380 |LogOn |Kerberos |C2106 |C2968$@DOM1 |Network |C2968
+|C2968$@DOM1 |Success |10666
+
+|1048556 |21144 |LogOff |? |C586 |C807$@DOM1 |Network |C586 |C807$@DOM1
+|Success |210
+
+|1048557 |425352 |LogOn |Kerberos |C1065 |C793$@DOM1 |Network |C793
+|C793$@DOM1 |Success |4342
+
+|1048558 |207170 |LogOff |? |C457 |C1079$@DOM1 |Network |C457
+|C1079$@DOM1 |Success |2094
+
+|1048559 |205879 |LogOn |Kerberos |C1065 |C599$@DOM1 |Network |C1619
+|C599$@DOM1 |Success |2079
+
+|1048560 |61028 |LogOff |? |C988 |C599$@DOM1 |Network |C988 |C599$@DOM1
+|Success |585
+
+|1048561 |399515 |LogOn |Kerberos |C467 |C1859$@DOM1 |Network |C1859
+|C1859$@DOM1 |Success |4100
+
+|1048562 |452201 |LogOn |Kerberos |C1755 |U63@DOM1 |Network |C1755
+|U63@DOM1 |Success |4599
+
+|1048563 |501638 |LogOff |? |C528 |C1018$@DOM1 |Network |C528
+|C1018$@DOM1 |Success |5134
+
+|1048564 |962187 |LogOn |Kerberos |C457 |C467$@DOM1 |Network |C467
+|C467$@DOM1 |Success |9814
+
+|1048565 |28086 |LogOn |Negotiate |C1666 |U63@DOM1 |Batch |C1666
+|U63@DOM1 |Success |271
+
+|1048566 |604263 |LogOn |Kerberos |C2106 |U38@DOM1 |Network |C968
+|U38@DOM1 |Success |6179
+
+|1048567 |586789 |LogOn |Kerberos |C586 |C903$@DOM1 |Network |C903
+|C903$@DOM1 |Success |6004
+
+|1048568 |167629 |LogOff |? |C586 |C1065$@DOM1 |Network |C586
+|C1065$@DOM1 |Success |1668
+
+|1048569 |23451 |LogOn |Kerberos |C467 |C3044$@DOM1 |Network |C3044
+|C3044$@DOM1 |Success |232
+
+|1048570 |607226 |LogOff |? |C457 |C794$@DOM1 |Network |C457 |C794$@DOM1
+|Success |6208
+
+|1048571 |598398 |LogOff |? |C586 |C2427$@DOM1 |Network |C586
+|C2427$@DOM1 |Success |6117
+
+|1048572 |684955 |LogOff |? |C528 |U22@DOM1 |Network |C528 |U22@DOM1
+|Success |7042
+
+|1048573 |623678 |LogOff |? |C457 |C2365$@DOM1 |Network |C457
+|C2365$@DOM1 |Success |6383
+
+|1048574 |272158 |TGS |? |C528 |C4808$@DOM1 |? |C4808 |C4808$@DOM1
+|Success |2779
+|=======================================================================
+
+1048575 rows × 10 columns
+----
+
+[[so-the-columns-authentication_type-contain-many-question-mark-so-replacing-it.]]
+=== So, the columns authentication_type contain many question mark so
+replacing it.
+
+
++*In[11]:*+
+[source, ipython3]
+----
+df2 = df1.replace('?', 'Kerberos' , 'authentication_type') 
+
+----
+
+[[replacing-the-question-mark-with-in-the-logon_type-with-network.]]
+=== Replacing the question mark with in the logon_type with Network.
+
+
++*In[12]:*+
+[source, ipython3]
+----
+df3 = df2.replace('?', 'Network' , 'logon_type')
+----
+
+[[view-of-the-dataset]]
+=== View of the dataset
+
+
++*In[13]:*+
+[source, ipython3]
+----
+df4 = df3.toPandas()
+----
+
+[[data-visualization]]
+=== Data Visualization
+
+
++*In[14]:*+
+[source, ipython3]
+----
+# Standard plotly imports
+import plotly.dashboard_objs as dashboard
+import plotly.plotly as py
+import plotly.figure_factory as ff
+import plotly.graph_objs as go
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from plotly import tools
+# Import plotly and  cufflinks modules to work with visualization in offline mode
+import cufflinks
+# Update to use cufflinks offline
+cufflinks.go_offline(connected=True)
+# Connect with java script to the notebook with init_notebook_mode() method
+from plotly.offline import iplot, init_notebook_mode
+init_notebook_mode(connected=False)
+
+from IPython.display import HTML, Image
+----
+
+
++*Out[14]:*+
+----
+
+
+
+----
+
+
++*In[15]:*+
+[source, ipython3]
+----
+# Windows Login State
+import plotly
+plotly.offline.init_notebook_mode(connected=False)
+import plotly.offline as py
+
+labels = df4['success_failure'].value_counts().index
+values = df4['success_failure'].value_counts().values
+
+colors = ['#eba796', '#96ebda']
+
+fig = {'data' : [{'type' : 'pie',
+                  'name' : "Window Logging State: Pie chart",
+                 'labels' : df4['success_failure'].value_counts().index,
+                 'values' : df4['success_failure'].value_counts().values,
+                 'direction' : 'clockwise',
+                 'marker' : {'colors' : ['#9cc359', '#e96b5c']}}], 'layout' : {'title' : 'Window Logging State'}}
+
+py.iplot(fig)
+----
+
+
++*Out[15]:*+
+----
+
+
+[[5b577c1a-07b2-4325-aa81-12d962542dfd]]
+----
+
+
++*In[16]:*+
+[source, ipython3]
+----
+# Standard plotly imports
+import plotly.plotly as py
+import plotly.graph_objs as go
+from plotly.offline import iplot, init_notebook_mode
+# Using plotly + cufflinks in offline mode
+import cufflinks
+cufflinks.go_offline(connected=True)
+init_notebook_mode(connected=False)
+
+df4['authentication_type'].iplot(kind='hist', xTitle='authentication_type', 
+                  yTitle='count', title='Authentication Type Distribution')
+----
+
+
++*Out[16]:*+
+----
+
+
+
+
+
+----
+
+
++*In[17]:*+
+[source, ipython3]
+----
+# Standard plotly imports
+import plotly.plotly as py
+import plotly.graph_objs as go
+from plotly.offline import iplot, init_notebook_mode
+# Using plotly + cufflinks in offline mode
+import cufflinks
+cufflinks.go_offline(connected=True)
+init_notebook_mode(connected=False)
+
+df4['logon_type'].iplot(kind='hist', yTitle='logon_type', orientation = 'v' ,
+                  xTitle='count', title='Logon Type Distribution' , color = 'red')
+
+----
+
+
++*Out[17]:*+
+----
+
+
+
+
+
+----
+
+
++*In[18]:*+
+[source, ipython3]
+----
+# Unusual web activity from any login
+data = []
+
+for col in df4['logon_type'].unique():
+    data.append(go.Box(y=df4[df4['logon_type'] == col]['time'], name=col))
+
+iplot(data)
+----
+
+
++*Out[18]:*+
+----
+
+----
+
+[[converting-categorical-features-to-integer]]
+=== Converting Categorical Features to Integer
+
+
++*In[19]:*+
+[source, ipython3]
+----
+df3.select("authentication_orientation").distinct().toPandas()
+----
+
+
++*Out[19]:*+
+----
+[width="100%",cols="50%,50%",options="header",]
+|============================
+| |authentication_orientation
+|0 |TGS
+|1 |TGT
+|2 |LogOn
+|3 |LogOff
+|4 |AuthMap
+|============================
+----
+
+
++*In[20]:*+
+[source, ipython3]
+----
+categories3 =df3.select("authentication_orientation").distinct().toPandas()["authentication_orientation"]
+----
+
+
++*In[21]:*+
+[source, ipython3]
+----
+categories3
+----
+
+
++*Out[21]:*+
+----0        TGS
+1        TGT
+2      LogOn
+3     LogOff
+4    AuthMap
+Name: authentication_orientation, dtype: object----
+
+
++*In[22]:*+
+[source, ipython3]
+----
+dictCategories3 = dict((v,int(k)) for (k,v) in categories3.to_dict().items())
+----
+
+
++*In[23]:*+
+[source, ipython3]
+----
+dictCategories3
+----
+
+
++*Out[23]:*+
+----{'AuthMap': 4, 'LogOff': 3, 'LogOn': 2, 'TGS': 0, 'TGT': 1}----
+
+
++*In[24]:*+
+[source, ipython3]
+----
+from pyspark.sql.functions import udf
+from pyspark.sql.types import IntegerType
+def categoriesToInt(cat):
+    return dictCategories3[cat]
+
+udfCategoriesToInt = udf(categoriesToInt, IntegerType())
+----
+
+
++*In[25]:*+
+[source, ipython3]
+----
+df3_incoded = df3.withColumn("authentication_orientation", udfCategoriesToInt("authentication_orientation") )
+----
+
+
++*In[26]:*+
+[source, ipython3]
+----
+df3_incoded.limit(10).toPandas()
+----
+
+
++*Out[26]:*+
+----
+[width="100%",cols="10%,9%,9%,9%,9%,9%,9%,9%,9%,9%,9%",options="header",]
+|=======================================================================
+| |event_id |authentication_orientation |authentication_type
+|destination_computer |destination_user_domain |logon_type
+|source_computer |source_user_domain |success_failure |time
+|0 |70782 |3 |Kerberos |C625 |C1042$@DOM1 |Network |C625 |C1042$@DOM1
+|Success |672
+
+|1 |962319 |2 |Kerberos |C528 |C2396$@DOM1 |Network |C2396 |C2396$@DOM1
+|Success |9816
+
+|2 |754005 |3 |Kerberos |C586 |C610$@DOM1 |Network |C586 |C610$@DOM1
+|Success |7717
+
+|3 |14447 |2 |Kerberos |C1972 |U202@DOM1 |Network |C1972 |C1972$@DOM1
+|Success |146
+
+|4 |790607 |1 |Kerberos |C2247 |C2246$@DOM1 |Network |C2247 |C2246$@DOM1
+|Success |8053
+
+|5 |399858 |2 |Kerberos |C625 |C101$@DOM1 |Network |C101 |C101$@DOM1
+|Success |4103
+
+|6 |11241 |3 |Kerberos |C586 |C2589$@DOM1 |Network |C586 |C2589$@DOM1
+|Success |112
+
+|7 |572896 |2 |Kerberos |C457 |C903$@DOM1 |Network |C903 |C903$@DOM1
+|Success |5861
+
+|8 |438489 |2 |Kerberos |C457 |C4923$@DOM1 |Network |C2225 |C4923$@DOM1
+|Success |4472
+
+|9 |20636 |3 |Kerberos |C586 |C3363$@DOM1 |Network |C586 |C3363$@DOM1
+|Success |204
+|=======================================================================
+----
+
+
++*In[27]:*+
+[source, ipython3]
+----
+df3_incoded.select("logon_type").distinct().toPandas()
+----
+
+
++*Out[27]:*+
+----
+[width="100%",cols="50%,50%",options="header",]
+|====================
+| |logon_type
+|0 |RemoteInteractive
+|1 |NewCredentials
+|2 |Interactive
+|3 |CachedInteractive
+|4 |NetworkCleartext
+|5 |Network
+|6 |Batch
+|7 |Service
+|8 |Unlock
+|====================
+----
+
+
++*In[28]:*+
+[source, ipython3]
+----
+categories2 =df3_incoded.select("logon_type").distinct().toPandas()["logon_type"]
+----
+
+
++*In[29]:*+
+[source, ipython3]
+----
+categories2
+----
+
+
++*Out[29]:*+
+----0    RemoteInteractive
+1       NewCredentials
+2          Interactive
+3    CachedInteractive
+4     NetworkCleartext
+5              Network
+6                Batch
+7              Service
+8               Unlock
+Name: logon_type, dtype: object----
+
+
++*In[30]:*+
+[source, ipython3]
+----
+dictCategories2 = dict((v,int(k)) for (k,v) in categories2.to_dict().items())
+----
+
+
++*In[31]:*+
+[source, ipython3]
+----
+dictCategories2
+----
+
+
++*Out[31]:*+
+----{'Batch': 6,
+ 'CachedInteractive': 3,
+ 'Interactive': 2,
+ 'Network': 5,
+ 'NetworkCleartext': 4,
+ 'NewCredentials': 1,
+ 'RemoteInteractive': 0,
+ 'Service': 7,
+ 'Unlock': 8}----
+
+
++*In[32]:*+
+[source, ipython3]
+----
+from pyspark.sql.functions import udf
+from pyspark.sql.types import IntegerType
+def categoriesToInt(cat):
+    return dictCategories2[cat]
+
+udfCategoriesToInt = udf(categoriesToInt, IntegerType())
+----
+
+
++*In[33]:*+
+[source, ipython3]
+----
+df4_incoded = df3_incoded.withColumn("logon_type", udfCategoriesToInt("logon_type") )
+----
+
+
++*In[34]:*+
+[source, ipython3]
+----
+df4_incoded.limit(10).toPandas()
+----
+
+
++*Out[34]:*+
+----
+[width="100%",cols="10%,9%,9%,9%,9%,9%,9%,9%,9%,9%,9%",options="header",]
+|=======================================================================
+| |event_id |authentication_orientation |authentication_type
+|destination_computer |destination_user_domain |logon_type
+|source_computer |source_user_domain |success_failure |time
+|0 |70782 |3 |Kerberos |C625 |C1042$@DOM1 |5 |C625 |C1042$@DOM1 |Success
+|672
+
+|1 |962319 |2 |Kerberos |C528 |C2396$@DOM1 |5 |C2396 |C2396$@DOM1
+|Success |9816
+
+|2 |754005 |3 |Kerberos |C586 |C610$@DOM1 |5 |C586 |C610$@DOM1 |Success
+|7717
+
+|3 |14447 |2 |Kerberos |C1972 |U202@DOM1 |5 |C1972 |C1972$@DOM1 |Success
+|146
+
+|4 |790607 |1 |Kerberos |C2247 |C2246$@DOM1 |5 |C2247 |C2246$@DOM1
+|Success |8053
+
+|5 |399858 |2 |Kerberos |C625 |C101$@DOM1 |5 |C101 |C101$@DOM1 |Success
+|4103
+
+|6 |11241 |3 |Kerberos |C586 |C2589$@DOM1 |5 |C586 |C2589$@DOM1 |Success
+|112
+
+|7 |572896 |2 |Kerberos |C457 |C903$@DOM1 |5 |C903 |C903$@DOM1 |Success
+|5861
+
+|8 |438489 |2 |Kerberos |C457 |C4923$@DOM1 |5 |C2225 |C4923$@DOM1
+|Success |4472
+
+|9 |20636 |3 |Kerberos |C586 |C3363$@DOM1 |5 |C586 |C3363$@DOM1 |Success
+|204
+|=======================================================================
+----
+
+
++*In[35]:*+
+[source, ipython3]
+----
+df4_incoded.select("authentication_type").distinct().toPandas()
+----
+
+
++*Out[35]:*+
+----
+[width="100%",cols="50%,50%",options="header",]
+|========================================
+| |authentication_type
+|0 |Negotiate
+|1 |MICROSOFT_AUTHENTICATION_PAC
+|2 |MICROSOFT_AUTHENTICATION_PACKAGE_
+|3 |MICROSOFT_AUTHENTICATION_PACKAGE_V1
+|4 |MICROSOFT_AUTHENTICATION_PACKAG
+|5 |MICROSOFT_AUTHENTICATION_PACKAGE
+|6 |NTLM
+|7 |MICROSOFT_AUTHENTICATION_PA
+|8 |MICROSOFT_AUTHENTICATION_PACKAGE_V1_0
+|9 |MICROSOFT_AUTHENTICATION_PACK
+|10 |Kerberos
+|========================================
+----
+
+
++*In[36]:*+
+[source, ipython3]
+----
+categories1 =df4_incoded.select("authentication_type").distinct().toPandas()["authentication_type"]
+----
+
+
++*In[37]:*+
+[source, ipython3]
+----
+categories1
+----
+
+
++*Out[37]:*+
+----0                                 Negotiate
+1              MICROSOFT_AUTHENTICATION_PAC
+2         MICROSOFT_AUTHENTICATION_PACKAGE_
+3       MICROSOFT_AUTHENTICATION_PACKAGE_V1
+4           MICROSOFT_AUTHENTICATION_PACKAG
+5          MICROSOFT_AUTHENTICATION_PACKAGE
+6                                      NTLM
+7               MICROSOFT_AUTHENTICATION_PA
+8     MICROSOFT_AUTHENTICATION_PACKAGE_V1_0
+9             MICROSOFT_AUTHENTICATION_PACK
+10                                 Kerberos
+Name: authentication_type, dtype: object----
+
+
++*In[38]:*+
+[source, ipython3]
+----
+dictCategories1 = dict((v,int(k)) for (k,v) in categories1.to_dict().items())
+----
+
+
++*In[39]:*+
+[source, ipython3]
+----
+dictCategories1
+----
+
+
++*Out[39]:*+
+----{'Kerberos': 10,
+ 'MICROSOFT_AUTHENTICATION_PA': 7,
+ 'MICROSOFT_AUTHENTICATION_PAC': 1,
+ 'MICROSOFT_AUTHENTICATION_PACK': 9,
+ 'MICROSOFT_AUTHENTICATION_PACKAG': 4,
+ 'MICROSOFT_AUTHENTICATION_PACKAGE': 5,
+ 'MICROSOFT_AUTHENTICATION_PACKAGE_': 2,
+ 'MICROSOFT_AUTHENTICATION_PACKAGE_V1': 3,
+ 'MICROSOFT_AUTHENTICATION_PACKAGE_V1_0': 8,
+ 'NTLM': 6,
+ 'Negotiate': 0}----
+
+
++*In[40]:*+
+[source, ipython3]
+----
+from pyspark.sql.functions import udf
+from pyspark.sql.types import IntegerType
+def categoriesToInt(cat):
+    return dictCategories1[cat]
+
+udfCategoriesToInt = udf(categoriesToInt, IntegerType())
+----
+
+
++*In[41]:*+
+[source, ipython3]
+----
+df5_incoded = df4_incoded.withColumn("authentication_type", udfCategoriesToInt("authentication_type") )
+----
+
+
++*In[42]:*+
+[source, ipython3]
+----
+df5_incoded.limit(10).toPandas()
+----
+
+
++*Out[42]:*+
+----
+[width="100%",cols="10%,9%,9%,9%,9%,9%,9%,9%,9%,9%,9%",options="header",]
+|=======================================================================
+| |event_id |authentication_orientation |authentication_type
+|destination_computer |destination_user_domain |logon_type
+|source_computer |source_user_domain |success_failure |time
+|0 |70782 |3 |10 |C625 |C1042$@DOM1 |5 |C625 |C1042$@DOM1 |Success |672
+
+|1 |962319 |2 |10 |C528 |C2396$@DOM1 |5 |C2396 |C2396$@DOM1 |Success
+|9816
+
+|2 |754005 |3 |10 |C586 |C610$@DOM1 |5 |C586 |C610$@DOM1 |Success |7717
+
+|3 |14447 |2 |10 |C1972 |U202@DOM1 |5 |C1972 |C1972$@DOM1 |Success |146
+
+|4 |790607 |1 |10 |C2247 |C2246$@DOM1 |5 |C2247 |C2246$@DOM1 |Success
+|8053
+
+|5 |399858 |2 |10 |C625 |C101$@DOM1 |5 |C101 |C101$@DOM1 |Success |4103
+
+|6 |11241 |3 |10 |C586 |C2589$@DOM1 |5 |C586 |C2589$@DOM1 |Success |112
+
+|7 |572896 |2 |10 |C457 |C903$@DOM1 |5 |C903 |C903$@DOM1 |Success |5861
+
+|8 |438489 |2 |10 |C457 |C4923$@DOM1 |5 |C2225 |C4923$@DOM1 |Success
+|4472
+
+|9 |20636 |3 |10 |C586 |C3363$@DOM1 |5 |C586 |C3363$@DOM1 |Success |204
+|=======================================================================
+----
+
+
++*In[43]:*+
+[source, ipython3]
+----
+from pyspark.sql.functions import udf
+from pyspark.sql.types import IntegerType
+----
+
+
++*In[44]:*+
+[source, ipython3]
+----
+df5_incoded.select("success_failure").distinct().toPandas()
+----
+
+
++*Out[44]:*+
+----
+[width="100%",cols="50%,50%",options="header",]
+|=================
+| |success_failure
+|0 |Success
+|1 |Fail
+|=================
+----
+
+
++*In[45]:*+
+[source, ipython3]
+----
+categories =df5_incoded.select("success_failure").distinct().toPandas()["success_failure"]
+----
+
+
++*In[46]:*+
+[source, ipython3]
+----
+categories
+----
+
+
++*Out[46]:*+
+----0    Success
+1       Fail
+Name: success_failure, dtype: object----
+
+
++*In[47]:*+
+[source, ipython3]
+----
+dictCategories = dict((v,int(k)) for (k,v) in categories.to_dict().items())
+----
+
+
++*In[48]:*+
+[source, ipython3]
+----
+dictCategories
+----
+
+
++*Out[48]:*+
+----{'Fail': 1, 'Success': 0}----
+
+
++*In[49]:*+
+[source, ipython3]
+----
+from pyspark.sql.types import DoubleType
+def categoriesToInt(cat):
+    return dictCategories[cat]
+
+udfCategoriesToInt = udf(categoriesToInt, IntegerType())
+----
+
+
++*In[50]:*+
+[source, ipython3]
+----
+df6_incoded1 = df5_incoded.withColumn("success_failure", udfCategoriesToInt("success_failure") )
+----
+
+
++*In[51]:*+
+[source, ipython3]
+----
+df6_incoded1.limit(10).toPandas()
+----
+
+
++*Out[51]:*+
+----
+[width="100%",cols="10%,9%,9%,9%,9%,9%,9%,9%,9%,9%,9%",options="header",]
+|=======================================================================
+| |event_id |authentication_orientation |authentication_type
+|destination_computer |destination_user_domain |logon_type
+|source_computer |source_user_domain |success_failure |time
+|0 |70782 |3 |10 |C625 |C1042$@DOM1 |5 |C625 |C1042$@DOM1 |0 |672
+
+|1 |962319 |2 |10 |C528 |C2396$@DOM1 |5 |C2396 |C2396$@DOM1 |0 |9816
+
+|2 |754005 |3 |10 |C586 |C610$@DOM1 |5 |C586 |C610$@DOM1 |0 |7717
+
+|3 |14447 |2 |10 |C1972 |U202@DOM1 |5 |C1972 |C1972$@DOM1 |0 |146
+
+|4 |790607 |1 |10 |C2247 |C2246$@DOM1 |5 |C2247 |C2246$@DOM1 |0 |8053
+
+|5 |399858 |2 |10 |C625 |C101$@DOM1 |5 |C101 |C101$@DOM1 |0 |4103
+
+|6 |11241 |3 |10 |C586 |C2589$@DOM1 |5 |C586 |C2589$@DOM1 |0 |112
+
+|7 |572896 |2 |10 |C457 |C903$@DOM1 |5 |C903 |C903$@DOM1 |0 |5861
+
+|8 |438489 |2 |10 |C457 |C4923$@DOM1 |5 |C2225 |C4923$@DOM1 |0 |4472
+
+|9 |20636 |3 |10 |C586 |C3363$@DOM1 |5 |C586 |C3363$@DOM1 |0 |204
+|=======================================================================
+----
+
+
++*In[52]:*+
+[source, ipython3]
+----
+df6_incoded1.columns
+----
+
+
++*Out[52]:*+
+----['event_id',
+ 'authentication_orientation',
+ 'authentication_type',
+ 'destination_computer',
+ 'destination_user_domain',
+ 'logon_type',
+ 'source_computer',
+ 'source_user_domain',
+ 'success_failure',
+ 'time']----
+
+
++*In[53]:*+
+[source, ipython3]
+----
+# Converting the type of the feature "label" from integer to double
+from pyspark.sql.types import DoubleType
+window_dataset = df6_incoded1.withColumn('success_failure',df6_incoded1['success_failure'].cast('double'))
+----
+
+
++*In[54]:*+
+[source, ipython3]
+----
+window_dataset.limit(5).toPandas()
+----
+
+
++*Out[54]:*+
+----
+[width="100%",cols="10%,9%,9%,9%,9%,9%,9%,9%,9%,9%,9%",options="header",]
+|=======================================================================
+| |event_id |authentication_orientation |authentication_type
+|destination_computer |destination_user_domain |logon_type
+|source_computer |source_user_domain |success_failure |time
+|0 |70782 |3 |10 |C625 |C1042$@DOM1 |5 |C625 |C1042$@DOM1 |0.0 |672
+
+|1 |962319 |2 |10 |C528 |C2396$@DOM1 |5 |C2396 |C2396$@DOM1 |0.0 |9816
+
+|2 |754005 |3 |10 |C586 |C610$@DOM1 |5 |C586 |C610$@DOM1 |0.0 |7717
+
+|3 |14447 |2 |10 |C1972 |U202@DOM1 |5 |C1972 |C1972$@DOM1 |0.0 |146
+
+|4 |790607 |1 |10 |C2247 |C2246$@DOM1 |5 |C2247 |C2246$@DOM1 |0.0 |8053
+|=======================================================================
+----
+
+
++*In[55]:*+
+[source, ipython3]
+----
+window_dataset.columns
+----
+
+
++*Out[55]:*+
+----['event_id',
+ 'authentication_orientation',
+ 'authentication_type',
+ 'destination_computer',
+ 'destination_user_domain',
+ 'logon_type',
+ 'source_computer',
+ 'source_user_domain',
+ 'success_failure',
+ 'time']----
+
+[[feature-selection]]
+=== Feature Selection
+
+
++*In[56]:*+
+[source, ipython3]
+----
+# Feature Selection, Dropping Source computer, Source_user domain, Destination_computer and Destination_user_domain as it 
+# Specific to each organisation network and generic model should not contain them.So,Droping those Column from the spark datafram
+drop_list = ['source_computer', 'destination_user_domain' , 
+ 'destination_computer' , 'source_user_domain']
+window_dataset=window_dataset.select([column for column in window_dataset.columns if column not in drop_list])        
+
+----
+
+
++*In[57]:*+
+[source, ipython3]
+----
+window_dataset.columns
+----
+
+
++*Out[57]:*+
+----['event_id',
+ 'authentication_orientation',
+ 'authentication_type',
+ 'logon_type',
+ 'success_failure',
+ 'time']----
+
+
++*In[58]:*+
+[source, ipython3]
+----
+#List off all the columns
+colum=window_dataset.columns
+colum.remove("success_failure")
+colum
+----
+
+
++*Out[58]:*+
+----['event_id',
+ 'authentication_orientation',
+ 'authentication_type',
+ 'logon_type',
+ 'time']----
+
+[[vectorizing]]
+=== Vectorizing
+
+
++*In[59]:*+
+[source, ipython3]
+----
+#Vectorizing the set of input features
+from pyspark.ml.feature import VectorAssembler
+df_vect = VectorAssembler(inputCols = colum, outputCol="features").transform(window_dataset)
+df_vect.select("features", "success_failure").limit(5).toPandas()
+----
+
+
++*Out[59]:*+
+----
+[width="100%",cols="34%,33%,33%",options="header",]
+|==========================================
+| |features |success_failure
+|0 |[70782.0, 3.0, 10.0, 5.0, 672.0] |0.0
+|1 |[962319.0, 2.0, 10.0, 5.0, 9816.0] |0.0
+|2 |[754005.0, 3.0, 10.0, 5.0, 7717.0] |0.0
+|3 |[14447.0, 2.0, 10.0, 5.0, 146.0] |0.0
+|4 |[790607.0, 1.0, 10.0, 5.0, 8053.0] |0.0
+|==========================================
+----
+
+[[scaling]]
+=== Scaling
+
+
++*In[60]:*+
+[source, ipython3]
+----
+#Applying Min-Max scaling
+from pyspark.ml.feature import MinMaxScaler
+mm_scaler = MinMaxScaler(inputCol="features", outputCol="minmax_scaled_features")
+
+----
+
+
++*In[61]:*+
+[source, ipython3]
+----
+mm = mm_scaler.fit(df_vect)
+df_scale = mm.transform(df_vect)
+df_scale.select("minmax_scaled_features", "success_failure").limit(5).toPandas()
+----
+
+
++*Out[61]:*+
+----
+[width="100%",cols="34%,33%,33%",options="header",]
+|=========================================================
+| |minmax_scaled_features |success_failure
+|0 |[0.06750215053968532, 0.75, 1.0, 0.625, 0.0625... |0.0
+|1 |[0.9177397112650132, 0.5, 1.0, 0.625, 0.915236... |0.0
+|2 |[0.7190756207954804, 0.75, 1.0, 0.625, 0.71950... |0.0
+|3 |[0.01377680545197573, 0.5, 1.0, 0.625, 0.01352... |0.0
+|4 |[0.753982074703359, 0.25, 1.0, 0.625, 0.750839... |0.0
+|=========================================================
+----
+
+[[divinding-the-dataset]]
+=== Divinding the dataset
+
+
++*In[62]:*+
+[source, ipython3]
+----
+df_train, df_test = df_scale.randomSplit(weights=[0.7, 0.3], seed=1)
+print("Number of observation in train-",df_train.count())
+print("Number of observation in test-",df_test.count())
+#df_train.count(), df_test.count()
+----
+
+
++*Out[62]:*+
+----
+Number of observation in train- 734380
+Number of observation in test- 314195
+----
+
+[[built-logistic-regression-classifier]]
+=== Built Logistic Regression Classifier
+
+
++*In[63]:*+
+[source, ipython3]
+----
+from pyspark.ml.classification import LogisticRegression
+lr = LogisticRegression(featuresCol = 'minmax_scaled_features', labelCol = 'success_failure', maxIter=10)
+lrModel = lr.fit(df_train)
+----
+
+[[prediction-result]]
+=== Prediction Result
+
+
++*In[64]:*+
+[source, ipython3]
+----
+#Run prediction on the whole dataset
+df_test_pred = lrModel.transform(df_test)
+df_test_pred.show()
+----
+
+
++*Out[64]:*+
+----
++--------+--------------------------+-------------------+----------+---------------+----+--------------------+----------------------+--------------------+--------------------+----------+
+|event_id|authentication_orientation|authentication_type|logon_type|success_failure|time|            features|minmax_scaled_features|       rawPrediction|         probability|prediction|
++--------+--------------------------+-------------------+----------+---------------+----+--------------------+----------------------+--------------------+--------------------+----------+
+|      93|                         2|                  0|         6|            0.0|   1|[93.0,2.0,0.0,6.0...|  [8.77382044567193...|[3.64788151146102...|[0.97461493663033...|       0.0|
+|     171|                         0|                 10|         5|            0.0|   1|[171.0,0.0,10.0,5...|  [1.62124943017850...|[3.33438879252797...|[0.96558989031640...|       0.0|
+|     250|                         2|                  0|         7|            0.0|   2|[250.0,2.0,0.0,7....|  [2.37465357714381...|[3.06709912593478...|[0.95551503049756...|       0.0|
+|     276|                         2|                  0|         7|            0.0|   2|[276.0,2.0,0.0,7....|  [2.62260937234758...|[3.06709903769048...|[0.95551502674664...|       0.0|
+|     326|                         2|                  0|         7|            0.0|   2|[326.0,2.0,0.0,7....|  [3.09944744004714...|[3.06709886798992...|[0.95551501953334...|       0.0|
+|     348|                         2|                  0|         7|            0.0|   2|[348.0,2.0,0.0,7....|  [3.30925618983495...|[3.06709879332167...|[0.95551501635949...|       0.0|
+|     406|                         2|                  0|         7|            0.0|   2|[406.0,2.0,0.0,7....|  [3.86238834836644...|[3.06709859646901...|[0.95551500799205...|       0.0|
+|     457|                         2|                  0|         7|            0.0|   2|[457.0,2.0,0.0,7....|  [4.34876317742000...|[3.06709842337443...|[0.95551500063448...|       0.0|
+|     513|                         2|                 10|         5|            0.0|   2|[513.0,2.0,10.0,5...|  [4.88282181324351...|[5.55484062205669...|[0.99614622404174...|       0.0|
+|     577|                         2|                  0|         7|            0.0|   2|[577.0,2.0,0.0,7....|  [5.49317453989894...|[3.06709801609307...|[0.95551498332254...|       0.0|
+|     586|                         0|                 10|         5|            0.0|   2|[586.0,0.0,10.0,5...|  [5.57900539208487...|[3.33438725165980...|[0.96558983911940...|       0.0|
+|     591|                         2|                  0|         7|            0.0|   2|[591.0,2.0,0.0,7....|  [5.62668919885482...|[3.06709796857691...|[0.95551498130281...|       0.0|
+|     629|                         2|                  0|         7|            0.0|   2|[629.0,2.0,0.0,7....|  [5.98908613030649...|[3.06709783960448...|[0.95551497582070...|       0.0|
+|     634|                         2|                  0|         7|            0.0|   2|[634.0,2.0,0.0,7....|  [6.03676993707644...|[3.06709782263442...|[0.95551497509937...|       0.0|
+|     703|                         2|                  0|         7|            0.0|   2|[703.0,2.0,0.0,7....|  [6.69480647050184...|[3.06709758844764...|[0.95551496514500...|       0.0|
+|     756|                         0|                 10|         5|            0.0|   2|[756.0,0.0,10.0,5...|  [7.20025482226337...|[3.33438667467787...|[0.96558981994853...|       0.0|
+|     912|                         2|                  0|         7|            0.0|   3|[912.0,2.0,0.0,7....|  [8.68798959348601...|[3.06709674674580...|[0.95551492936751...|       0.0|
+|     961|                         2|                  0|         7|            0.0|   3|[961.0,2.0,0.0,7....|  [9.15529089983158...|[3.06709658043925...|[0.95551492229846...|       0.0|
+|    1221|                         2|                  0|         7|            0.0|   3|[1221.0,2.0,0.0,7...|  [0.00116348488518...|[3.06709569799630...|[0.95551488478918...|       0.0|
+|    1325|                         2|                  0|         7|            0.0|   3|[1325.0,2.0,0.0,7...|  [0.00126266720326...|[3.06709534501912...|[0.95551486978547...|       0.0|
++--------+--------------------------+-------------------+----------+---------------+----+--------------------+----------------------+--------------------+--------------------+----------+
+only showing top 20 rows
+
+----
+
+
++*In[65]:*+
+[source, ipython3]
+----
+df_test_pred.limit(5).toPandas()
+----
+
+
++*Out[65]:*+
+----
+[width="100%",cols="12%,8%,8%,8%,8%,8%,8%,8%,8%,8%,8%,8%",options="header",]
+|=======================================================================
+| |event_id |authentication_orientation |authentication_type |logon_type
+|success_failure |time |features |minmax_scaled_features |rawPrediction
+|probability |prediction
+|0 |93 |2 |0 |6 |0.0 |1 |[93.0, 2.0, 0.0, 6.0, 1.0]
+|[8.773820445671932e-05, 0.5, 0.0, 0.75, 0.0] |[3.6478815114610232,
+-3.6478815114610232] |[0.9746149366303304, 0.025385063369669694] |0.0
+
+|1 |171 |0 |10 |5 |0.0 |1 |[171.0, 0.0, 10.0, 5.0, 1.0]
+|[0.0001621249430178509, 0.0, 1.0, 0.625, 0.0] |[3.334388792527979,
+-3.334388792527979] |[0.9655898903164073, 0.03441010968359272] |0.0
+
+|2 |250 |2 |0 |7 |0.0 |2 |[250.0, 2.0, 0.0, 7.0, 2.0]
+|[0.00023746535771438163, 0.5, 0.0, 0.875, 9.32... |[3.067099125934783,
+-3.067099125934783] |[0.9555150304975653, 0.044484969502434815] |0.0
+
+|3 |276 |2 |0 |7 |0.0 |2 |[276.0, 2.0, 0.0, 7.0, 2.0]
+|[0.0002622609372347588, 0.5, 0.0, 0.875, 9.324... |[3.0670990376904883,
+-3.0670990376904883] |[0.9555150267466481, 0.044484973253351975] |0.0
+
+|4 |326 |2 |0 |7 |0.0 |2 |[326.0, 2.0, 0.0, 7.0, 2.0]
+|[0.00030994474400471497, 0.5, 0.0, 0.875, 9.32... |[3.0670988679899214,
+-3.0670988679899214] |[0.955515019533345, 0.04448498046665508] |0.0
+|=======================================================================
+----
+
+[[confusion-matrix]]
+=== Confusion Matrix
+
+
++*In[66]:*+
+[source, ipython3]
+----
+df_test_pred.groupBy("success_failure").pivot("prediction").count().show()
+----
+
+
++*Out[66]:*+
+----
++---------------+------+
+|success_failure|   0.0|
++---------------+------+
+|            0.0|312018|
+|            1.0|  2177|
++---------------+------+
+
+----
+
+[[evaluation-and-accuracy]]
+=== Evaluation and Accuracy
+
+
++*In[67]:*+
+[source, ipython3]
+----
+#Evaluate
+from pyspark.ml.evaluation import BinaryClassificationEvaluator
+evaluator = BinaryClassificationEvaluator(labelCol="success_failure")
+evaluator.evaluate(df_test_pred)
+----
+
+
++*Out[67]:*+
+----0.8748449190946002----
+
+[[build-randomforest-classifer]]
+=== Build RandomForest Classifer
+
+
++*In[68]:*+
+[source, ipython3]
+----
+import pyspark
+from pyspark.ml.pipeline import Pipeline
+
+from pyspark.ml.classification import RandomForestClassifier
+from pyspark.ml import evaluation
+from pyspark.sql.functions import *
+
+forest = RandomForestClassifier(labelCol="success_failure", featuresCol="minmax_scaled_features", seed = 123)
+----
+
+
++*In[69]:*+
+[source, ipython3]
+----
+forest_model = forest.fit(df_train)
+----
+
+[[prediction-result]]
+=== Prediction Result
+
+
++*In[70]:*+
+[source, ipython3]
+----
+#Run prediction on the whole dataset
+df_test_pred1 = forest_model.transform(df_test)
+df_test_pred1.show()
+----
+
+
++*Out[70]:*+
+----
++--------+--------------------------+-------------------+----------+---------------+----+--------------------+----------------------+--------------------+--------------------+----------+
+|event_id|authentication_orientation|authentication_type|logon_type|success_failure|time|            features|minmax_scaled_features|       rawPrediction|         probability|prediction|
++--------+--------------------------+-------------------+----------+---------------+----+--------------------+----------------------+--------------------+--------------------+----------+
+|      93|                         2|                  0|         6|            0.0|   1|[93.0,2.0,0.0,6.0...|  [8.77382044567193...|[17.8282522408706...|[0.89141261204353...|       0.0|
+|     171|                         0|                 10|         5|            0.0|   1|[171.0,0.0,10.0,5...|  [1.62124943017850...|[19.5737444498968...|[0.97868722249484...|       0.0|
+|     250|                         2|                  0|         7|            0.0|   2|[250.0,2.0,0.0,7....|  [2.37465357714381...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     276|                         2|                  0|         7|            0.0|   2|[276.0,2.0,0.0,7....|  [2.62260937234758...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     326|                         2|                  0|         7|            0.0|   2|[326.0,2.0,0.0,7....|  [3.09944744004714...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     348|                         2|                  0|         7|            0.0|   2|[348.0,2.0,0.0,7....|  [3.30925618983495...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     406|                         2|                  0|         7|            0.0|   2|[406.0,2.0,0.0,7....|  [3.86238834836644...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     457|                         2|                  0|         7|            0.0|   2|[457.0,2.0,0.0,7....|  [4.34876317742000...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     513|                         2|                 10|         5|            0.0|   2|[513.0,2.0,10.0,5...|  [4.88282181324351...|[19.9987778440496...|[0.99993889220248...|       0.0|
+|     577|                         2|                  0|         7|            0.0|   2|[577.0,2.0,0.0,7....|  [5.49317453989894...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     586|                         0|                 10|         5|            0.0|   2|[586.0,0.0,10.0,5...|  [5.57900539208487...|[19.5737444498968...|[0.97868722249484...|       0.0|
+|     591|                         2|                  0|         7|            0.0|   2|[591.0,2.0,0.0,7....|  [5.62668919885482...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     629|                         2|                  0|         7|            0.0|   2|[629.0,2.0,0.0,7....|  [5.98908613030649...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     634|                         2|                  0|         7|            0.0|   2|[634.0,2.0,0.0,7....|  [6.03676993707644...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     703|                         2|                  0|         7|            0.0|   2|[703.0,2.0,0.0,7....|  [6.69480647050184...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     756|                         0|                 10|         5|            0.0|   2|[756.0,0.0,10.0,5...|  [7.20025482226337...|[19.5737444498968...|[0.97868722249484...|       0.0|
+|     912|                         2|                  0|         7|            0.0|   3|[912.0,2.0,0.0,7....|  [8.68798959348601...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|     961|                         2|                  0|         7|            0.0|   3|[961.0,2.0,0.0,7....|  [9.15529089983158...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|    1221|                         2|                  0|         7|            0.0|   3|[1221.0,2.0,0.0,7...|  [0.00116348488518...|[19.9879058018047...|[0.99939529009023...|       0.0|
+|    1325|                         2|                  0|         7|            0.0|   3|[1325.0,2.0,0.0,7...|  [0.00126266720326...|[19.9879058018047...|[0.99939529009023...|       0.0|
++--------+--------------------------+-------------------+----------+---------------+----+--------------------+----------------------+--------------------+--------------------+----------+
+only showing top 20 rows
+
+----
+
+[[confusion-metrics]]
+=== Confusion Metrics
+
+
++*In[71]:*+
+[source, ipython3]
+----
+df_test_pred1.groupBy("Success_Failure").pivot("prediction").count().show()
+----
+
+
++*Out[71]:*+
+----
++---------------+------+---+
+|Success_Failure|   0.0|1.0|
++---------------+------+---+
+|            0.0|311974| 44|
+|            1.0|  2040|137|
++---------------+------+---+
+
+----
+
+[[evaluate]]
+=== Evaluate
+
+
++*In[72]:*+
+[source, ipython3]
+----
+#Evaluate
+evaluator = evaluation.MulticlassClassificationEvaluator(labelCol="success_failure", 
+                                        metricName="accuracy", predictionCol="prediction")
+evaluator.evaluate(df_test_pred1)
+----
+
+
++*Out[72]:*+
+----0.9933671764350165----

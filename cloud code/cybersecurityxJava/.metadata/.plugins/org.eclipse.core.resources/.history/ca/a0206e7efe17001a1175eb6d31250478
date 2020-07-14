@@ -1,0 +1,16 @@
+package io.kryptoblocks.msa.network.stream.service.business.impl;
+
+import java.util.List;
+
+import io.kryptoblocks.msa.network.stream.service.ElasticSearch.NetworkSourcingModelElasticSearch;
+import io.kryptoblocks.msa.network.stream.service.business.NetworkSaveDataElasticSearch;
+
+public class NetworkSaveDataElasticSearchImpl implements NetworkSaveDataElasticSearch{
+
+	@Override
+	public void saveDatatoElasticSearch(List<NetworkSourcingModelElasticSearch> siemNetworkDataSourcingModelListES) {
+		
+		
+	}
+
+}

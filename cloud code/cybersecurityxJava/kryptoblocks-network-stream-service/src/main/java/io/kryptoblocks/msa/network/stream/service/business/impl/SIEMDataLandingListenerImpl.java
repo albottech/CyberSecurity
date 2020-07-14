@@ -1,0 +1,191 @@
+package io.kryptoblocks.msa.network.stream.service.business.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.StreamListener;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
+
+import io.kryptoblocks.msa.network.repository.key.NetworkDataSourcingKey;
+import io.kryptoblocks.msa.network.repository.model.NetworkDataSourcingModel;
+import io.kryptoblocks.msa.network.stream.service.ElasticSearch.NetworkSourcingModelElasticSearch;
+import io.kryptoblocks.msa.network.stream.service.business.NetworkDataLandingListnerService;
+import io.kryptoblocks.msa.network.stream.service.business.NetworkDatraStream;
+import io.kryptoblocks.msa.network.stream.service.business.NetworkSaveDataElasticSearch;
+import io.kryptoblocks.msa.network.stream.service.business.SIEMDataLandingListener;
+import io.kryptoblocks.msa.network.stream.service.udp.SIEMRecievedJSONModel;
+
+public class SIEMDataLandingListenerImpl implements SIEMDataLandingListener{
+	
+	@Autowired 
+	SIEMRecievedJSONModel sIEMRecievedJSONModel;
+	
+	@Autowired
+	NetworkDataSourcingModel networkDataSourcingModel;
+	
+	@Autowired
+	NetworkSourcingModelElasticSearch networkSourcingModelElasticSearch;
+	
+	@Autowired
+	NetworkSaveDataElasticSearch networkSaveDataElasticSearch;
+	
+	@Autowired
+	NetworkDataLandingListnerService networkDataLandingListnerService;
+	
+	ObjectMapper objectMapper = new ObjectMapper();
+	
+	@Autowired
+	NetworkDataSourcingKey networkDataSourcingKey;
+	
+	List<SIEMRecievedJSONModel> sIEMRecievedJSONModelList = new ArrayList<SIEMRecievedJSONModel>();
+	
+	List<NetworkDataSourcingModel> siemNetworkDataSourcingModelListCass = new ArrayList<NetworkDataSourcingModel>();
+	
+	List<NetworkSourcingModelElasticSearch> siemNetworkDataSourcingModelListES = new ArrayList<NetworkSourcingModelElasticSearch>();
+	
+
+	Map<String,String> dataPropertiesMap = new LinkedHashMap<>();
+	
+	/** The Constant LOGGER. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(SIEMDataLandingListenerImpl.class);
+	
+	@Override
+	@StreamListener(NetworkDatraStream.NETWORK_DATA_LANDING_STREAM_INPUT)
+	public void listenToNetworkDataLandingStreamTopic(String input) {
+		
+		try{
+			
+			if(input != null && input.contains("Mcafee SIEM")) {
+				
+				sIEMRecievedJSONModel = (SIEMRecievedJSONModel) objectMapper.readValue(input, SIEMRecievedJSONModel.class);
+					
+				LOGGER.info("sIEMRecievedJSONModel {}", sIEMRecievedJSONModel.toString());
+				
+				sIEMRecievedJSONModelList.add(sIEMRecievedJSONModel);				
+				
+				//Derive the SOURCING model
+				siemNetworkDataSourcingModelListCass = deriveSIEMNetworkDataSourcingModelCass(sIEMRecievedJSONModelList);
+				siemNetworkDataSourcingModelListES = derivesiemNetworkDataSourcingModelES(sIEMRecievedJSONModelList);
+				
+				
+				//save data to Elastic Search
+				networkSaveDataElasticSearch.saveSIEMDatatoElasticSearch(siemNetworkDataSourcingModelListES);
+				
+				//send data to listener service for saving to cassandra
+				networkDataLandingListnerService.sourceNetworkData(siemNetworkDataSourcingModelListCass); 
+			}
+			
+			
+		}
+		catch(Exception e) {
+			
+		}
+	}	
+		/**
+		 * Derive network data sourcing model.
+		 *
+		 * @param input the input
+		 * @return the network data sourcing model
+		 */
+		private List<NetworkDataSourcingModel> deriveSIEMNetworkDataSourcingModelCass(List<SIEMRecievedJSONModel> sIEMRecievedJSONModelList){
+
+			byte[]  networkDataSourcingBytes;			
+			  
+			  String timeProperty = "writetime";
+			  String timeStamp = null;
+			  
+			try {
+				
+				int i = 0;
+				
+				while (i < sIEMRecievedJSONModelList.size()) {				
+				
+					networkDataSourcingKey.setClient("QATAR_CLIENT");
+					networkDataSourcingKey.setDataCenter("KRYPTOBLOCKS_DATA_CENTER");
+					networkDataSourcingKey.setRountingIdentifier("KRYPTOBLOCKS_ROUTER");
+					networkDataSourcingKey.setCollectorType(sIEMRecievedJSONModel.getType());				
+					
+				
+			       dataPropertiesMap = sIEMRecievedJSONModel.getData().getDataProperties();
+							  
+				  if(dataPropertiesMap.containsKey(timeProperty)) {
+					  timeStamp =  dataPropertiesMap.get(timeProperty);
+			       }
+				  
+				  networkDataSourcingKey.setTimeStamp(timeStamp);
+				  networkDataSourcingModel.setKey(networkDataSourcingKey);
+				  
+				   
+				   networkDataSourcingBytes = objectMapper.writeValueAsBytes(sIEMRecievedJSONModel);
+				   networkDataSourcingModel.setNetworkDataSourcingBytes(networkDataSourcingBytes);				  				   				   
+				   siemNetworkDataSourcingModelListCass.add(networkDataSourcingModel);
+				   i++;
+				   
+				}
+				
+			}catch(Exception e) {
+				LOGGER.info("In deriveNetworkDataSourcingModel throwing exception" + e);
+			}
+			
+			return siemNetworkDataSourcingModelListCass;
+		}
+		
+		/**
+		 * Derive network data sourcing model.
+		 *
+		 * @param input the input
+		 * @return the network data sourcing model
+		 */
+		private List<NetworkSourcingModelElasticSearch> derivesiemNetworkDataSourcingModelES(List<SIEMRecievedJSONModel> sIEMRecievedJSONModelList){
+
+			int i = 0;
+			
+			try {
+				
+				
+				while (i < sIEMRecievedJSONModelList.size()) {				
+					
+					networkSourcingModelElasticSearch.setClient("QATAR_CLIENT");
+					networkSourcingModelElasticSearch.setDataCenter("KRYPTOBLOCKS_DATA_CENTER");
+					networkSourcingModelElasticSearch.setRountingIdentifier("KRYPTOBLOCKS_ROUTER");
+					networkSourcingModelElasticSearch.setCollectorType(sIEMRecievedJSONModel.getType());				
+				    dataPropertiesMap = sIEMRecievedJSONModel.getData().getDataProperties();
+				  
+				    String timeProperty = "writetime";
+				    String timeStamp = null;
+				  
+				    if(dataPropertiesMap.containsKey(timeProperty)) {
+					   timeStamp =  dataPropertiesMap.get(timeProperty);
+			        }
+				   
+				    networkSourcingModelElasticSearch.setTimeStamp(timeStamp);
+				    networkSourcingModelElasticSearch.setSIEMRecievedJSONModel(sIEMRecievedJSONModel);
+				    LOGGER.info("networkSourcingModelElasticSearch {}",networkSourcingModelElasticSearch);
+				    siemNetworkDataSourcingModelListES.add(networkSourcingModelElasticSearch);
+				    i++;				
+				}
+				
+			}catch(Exception e) {
+				LOGGER.info("In derivesiemNetworkDataSourcingModelES throwing exception" + e);
+			}
+			
+			return siemNetworkDataSourcingModelListES;
+		}
+		
+	
+}

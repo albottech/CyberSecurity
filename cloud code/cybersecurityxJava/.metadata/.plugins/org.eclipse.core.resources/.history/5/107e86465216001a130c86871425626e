@@ -1,0 +1,209 @@
+package io.kryptoblocks.msa.network.stream.service.udp;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
+public class SIEMRecievedJSONModel{
+
+	   	 Source source;
+		 Fields fields;
+		 Data data;
+		 String type; 
+		 
+		 
+		 public SIEMRecievedJSONModel(Source source, Fields fields, Data data, String type) {
+			super();
+			this.source = source;
+			this.fields = fields;
+			this.data = data;
+			this.type = type;
+		}
+
+		public SIEMRecievedJSONModel() {
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public String toString() {
+			return "SIEMRecievedJSONModel [source=" + source + ", fields=" + fields + ", data=" + data + ", type="
+					+ type + "]";
+		}
+		@Getter @Setter
+		public static class Source {
+			 String sourceId;
+			 String sourceName;
+			 String sourceSubnet;
+			 String sourceHost;
+			
+			 public Source() {
+				 
+			 }
+			 
+			public Source(String sourceId, String sourceName, String sourceSubnet, String sourceHost) {
+				super();
+				this.sourceId = sourceId;
+				this.sourceName = sourceName;
+				this.sourceSubnet = sourceSubnet;
+				this.sourceHost = sourceHost;
+			}
+			@Override
+			public String toString() {
+				return "Source [sourceId=" + sourceId + ", sourceName=" + sourceName + ", sourceSubnet=" + sourceSubnet
+						+ ", sourceHost=" + sourceHost + "]";
+			}
+			 
+			 
+		}
+		@Getter @Setter
+		static class Fields {
+			 
+		 }
+		@Getter @Setter
+		public static class Data{
+			 	private Sig sig;
+				private NormSig normSig;
+				private String dataAlertId;
+				private String dataThirdPartyType;
+				private String dataAction;
+				private String dataSourceIP;
+				private String dataDestinationIP;
+				private String dataSourcePort;
+				private String dataDestinationPort;
+				private String dataProtocol;
+				private String dataSourceMAC;
+				private String dataDestinationMAC;
+				private String dataFirstTime;
+				private String dataLastTime;
+				private String dataWriteTime;
+				private String dataSourceGuid;
+				private String dataDestinationGuid;
+				private String dataTotalSeverity;
+				private String dataSeverity;
+				private String dataEventCount;
+				private String dataFlow;
+				private String dataVlan;
+				private String dataSequence;
+				private String dataTrusted;
+				private String dataSessionId;
+				private String dataCompressionLevel;
+				private String dataReviewed;
+				private String dataAppId;
+				private String dataDomainID;
+				private String dataHostId;
+				private String dataObjectId;
+				private String dataUserIdSrc;
+				private String dataSecurityId;
+				private String dataProcessName;
+				private String dataLogonType;
+				private String dataSourceLogonId;
+				private String dataDestinationLogonId;
+
+				@Override
+				public String toString() {
+					return "\nsig-->" + sig + ",\n\nnormSig-->" + normSig + ",\n\n dataAlertId=" + dataAlertId
+							+ ",\n dataThirdPartyType=" + dataThirdPartyType + ",\n dataAction=" + dataAction + ",\n dataSourceIP="
+							+ dataSourceIP + ",\n dataDestinationType=" + dataDestinationIP + ",\n dataSourcePort="
+							+ dataSourcePort + ",\n dataDestinationPort=" + dataDestinationPort + ",\n dataProtocol=" + dataProtocol
+							+ ",\n dataSourceMAC=" + dataSourceMAC + ",\n dataDestinationMAC=" + dataDestinationMAC
+							+ ",\n dataFirstTime=" + dataFirstTime + ",\n dataLastTime=" + dataLastTime + ",\n dataWriteTime="
+							+ dataWriteTime + ",\n dataSourceGuid=" + dataSourceGuid + ",\n dataDestinationGuid="
+							+ dataDestinationGuid + ",\n dataTotalSeverity=" + dataTotalSeverity + ",\n dataSeverity="
+							+ dataSeverity + ",\n dataEventCount=" + dataEventCount + ",\n dataFlow=" + dataFlow + ",\n dataVlan="
+							+ dataVlan + ",\n dataSequence=" + dataSequence + ",\n dataTrusted=" + dataTrusted
+							+ ",\n dataSessionId=" + dataSessionId + ",\n dataCompressionLevel=" + dataCompressionLevel
+							+ ",\n dataReviewed=" + dataReviewed + ",\n dataAppId=" + dataAppId + ",\n dataDomainID=" + dataDomainID
+							+ ",\n dataHostId=" + dataHostId + ",\n dataObjectId=" + dataObjectId + ",\n dataUserIdSrc="
+							+ dataUserIdSrc + ",\n dataSecurityId=" + dataSecurityId + ",\n dataProcessName=" + dataProcessName
+							+ ",\n dataLogonType=" + dataLogonType + ",\n dataSourceLogonId=" + dataSourceLogonId
+							+ ",\n dataDestinationLogonId=" + dataDestinationLogonId;
+				}
+
+				public Data(Sig sig, NormSig normSig, String dataAlertId, String dataThirdPartyType, String dataAction,
+						String dataSourceIP, String dataDestinationIP, String dataSourcePort, String dataDestinationPort,
+						String dataProtocol, String dataSourceMAC, String dataDestinationMAC, String dataFirstTime,
+						String dataLastTime, String dataWriteTime, String dataSourceGuid, String dataDestinationGuid,
+						String dataTotalSeverity, String dataSeverity, String dataEventCount, String dataFlow, String dataVlan,
+						String dataSequence, String dataTrusted, String dataSessionId, String dataCompressionLevel,
+						String dataReviewed, String dataAppId, String dataDomainID, String dataHostId, String dataObjectId,
+						String dataUserIdSrc, String dataSecurityId, String dataProcessName, String dataLogonType,
+						String dataSourceLogonId, String dataDestinationLogonId) {
+					super();
+					this.sig = sig;
+					this.normSig = normSig;
+					this.dataAlertId = dataAlertId;
+					this.dataThirdPartyType = dataThirdPartyType;
+					this.dataAction = dataAction;
+					this.dataSourceIP = dataSourceIP;
+					this.dataDestinationIP = dataDestinationIP;
+					this.dataSourcePort = dataSourcePort;
+					this.dataDestinationPort = dataDestinationPort;
+					this.dataProtocol = dataProtocol;
+					this.dataSourceMAC = dataSourceMAC;
+					this.dataDestinationMAC = dataDestinationMAC;
+					this.dataFirstTime = dataFirstTime;
+					this.dataLastTime = dataLastTime;
+					this.dataWriteTime = dataWriteTime;
+					this.dataSourceGuid = dataSourceGuid;
+					this.dataDestinationGuid = dataDestinationGuid;
+					this.dataTotalSeverity = dataTotalSeverity;
+					this.dataSeverity = dataSeverity;
+					this.dataEventCount = dataEventCount;
+					this.dataFlow = dataFlow;
+					this.dataVlan = dataVlan;
+					this.dataSequence = dataSequence;
+					this.dataTrusted = dataTrusted;
+					this.dataSessionId = dataSessionId;
+					this.dataCompressionLevel = dataCompressionLevel;
+					this.dataReviewed = dataReviewed;
+					this.dataAppId = dataAppId;
+					this.dataDomainID = dataDomainID;
+					this.dataHostId = dataHostId;
+					this.dataObjectId = dataObjectId;
+					this.dataUserIdSrc = dataUserIdSrc;
+					this.dataSecurityId = dataSecurityId;
+					this.dataProcessName = dataProcessName;
+					this.dataLogonType = dataLogonType;
+					this.dataSourceLogonId = dataSourceLogonId;
+					this.dataDestinationLogonId = dataDestinationLogonId;
+				}
+				@Getter @Setter
+				public static class Sig {
+					private String dataSigId;
+					private String dataSigName;
+					
+					
+					public Sig(String dataSigId, String dataSigName) {
+						super();
+						this.dataSigId = dataSigId;
+						this.dataSigName = dataSigName;
+					}
+
+
+					@Override
+					public String toString() {
+						return "\n dataSigId=" + dataSigId + ",\n dataSigName=" + dataSigName;
+					}
+				}
+				@Getter @Setter
+				public static class NormSig {
+					private String dataNormSigId;
+					private String dataNormSigName;
+						
+					@Override
+					public String toString() {
+						return "\n dataNormSigId=" + dataNormSigId + ",\n dataNormSigName=" + dataNormSigName;
+					}
+
+					public NormSig(String dataNormSigId, String dataNormSigName) {
+						super();
+						this.dataNormSigId = dataNormSigId;
+						this.dataNormSigName = dataNormSigName;
+					}
+				}
+		 }
+}
+
+	
+
+

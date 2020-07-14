@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+	<springProperty scope="context" name="logPathTextFileLocation" source="log.path.text.file.location" defaultValue="/log/"/>
+	<springProperty scope="context" name="logPathTextPerformanceMetricFileName" source="log.path.text.performance.metric.file.name" defaultValue="performance-metric-txt-log.txt"/>   	
+   	<springProperty scope="context" name="logPathTextExceptionMetricFileName" source="log.path.text.exception.metric.file.name" defaultValue="exception-metric-txt-log.txt"/>   	
+   	<springProperty scope="context" name="logPathTextTraceMetricFileName" source="log.path.text.trace.metric.file.name" defaultValue="trace-metric-txt-log.txt"/>   	
+   	<springProperty scope="context" name="logPathTextBusinessMetricFileName" source="log.path.text.business.metric.file.name" defaultValue="business-metric-txt-log.txt"/>   	
+  	<springProperty scope="context" name="serviceName" source="spring.application.name" defaultValue="unKnownServiceName"/>
+
+	
+	<property name="FILE_LOG_PATTERN" value="%m%n%wex"/>
+
+	<appender name="PerformanceMetricFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<file>${logPathTextFileLocation}${serviceName}-${logPathTextPerformanceMetricFileName}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${logPathTextFileLocation}${serviceName}-${logPathTextPerformanceMetricFileName}.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	
+	<appender name="ExceptionMetricFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<file>${logPathTextFileLocation}${serviceName}-${logPathTextExceptionMetricFileName}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${logPathTextFileLocation}${serviceName}-${logPathTextExceptionMetricFileName}.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	
+	<appender name="TraceMetricFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<file>${logPathTextFileLocation}${serviceName}-${logPathTextTraceMetricFileName}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${logPathTextFileLocation}${serviceName}-${logPathTextTraceMetricFileName}.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	
+	<appender name="BusinessMetricFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<file>${logPathTextFileLocation}${serviceName}-${logPathTextBusinessMetricFileName}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${logPathTextFileLocation}${serviceName}-${logPathTextBusinessMetricFileName}.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	
+	<logger name="PerformanceMetricLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="PerformanceMetricFileAppender"/>
+    </logger>
+    
+    <logger name="ExceptionMetricLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="ExceptionMetricFileAppender"/>
+    </logger>
+    
+    <logger name="TraceMetricLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="TraceMetricFileAppender"/>
+    </logger>
+    
+    <logger name="BusinessMetricLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="BusinessMetricFileAppender"/>
+    </logger>
+	
+</included>

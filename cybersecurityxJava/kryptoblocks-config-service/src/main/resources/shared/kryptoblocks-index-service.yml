@@ -1,0 +1,47 @@
+server:
+  context-path: /indexService
+  
+elastic:
+  cluster:
+    enabled: false
+    name: elasticsearch
+  local:
+    host: localhost
+    port: 9300
+
+performance:
+  metric:
+    index:
+      name: performance-metric
+      type: performance-metric
+      destination:  ELASTIC_SEARCH
+ 
+trace:
+  metric:
+    index:
+      name: trace-metric
+      type: trace-metric
+      destination:  ELASTIC_SEARCH
+ 
+
+exception:
+  metric:
+    index:
+      name: exception-metric
+      type: exception-metric
+      destination:  ELASTIC_SEARCH
+ 
+
+business:
+  activity:
+    metric:
+      index:
+        name: business-activity
+        type: business-activity
+        destination:  ELASTIC_SEARCH
+ 
+
+log:
+  path:
+    txt:  /log/index-service/txt/log.txt
+    json: /log/index-service/json/json-log.json

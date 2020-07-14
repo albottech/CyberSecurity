@@ -1,0 +1,272 @@
+package io.kryptoblocks.msa.network.stream.service.udp;
+
+import lombok.Getter;
+import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Getter @Setter
+public class SIEMRecievedJSONModel{
+		
+		 @JsonProperty("source")
+	   	 Source source;
+		 
+		 @JsonProperty("fields")
+		 Fields fields;
+		 
+		 @JsonProperty("data")
+		 Data data;
+		 
+		 String type; 
+		 
+		 
+		 public SIEMRecievedJSONModel(Source source, Fields fields, Data data, String type) {
+			super();
+			this.source = source;
+			this.fields = fields;
+			this.data = data;
+			this.type = type;
+		}
+
+		public SIEMRecievedJSONModel() {
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public String toString() {
+			return "SIEMRecievedJSONModel [source=" + source + ", fields=" + fields + ", data=" + data + ", type="
+					+ type + "]";
+		}
+		@Getter @Setter
+		public static class Source {
+			
+			 @JsonProperty("id")
+			 String sourceId;
+			
+			 @JsonProperty("name")
+			 String sourceName;
+			 
+			 @JsonProperty("subnet")
+			 String sourceSubnet;
+			 
+			 @JsonProperty("host")
+			 String sourceHost;
+			
+			 public Source() {
+				 
+			 }
+			 
+			public Source(String sourceId, String sourceName, String sourceSubnet, String sourceHost) {
+				super();
+				this.sourceId = sourceId;
+				this.sourceName = sourceName;
+				this.sourceSubnet = sourceSubnet;
+				this.sourceHost = sourceHost;
+			}
+			@Override
+			public String toString() {
+				return "Source [sourceId=" + sourceId + ", sourceName=" + sourceName + ", sourceSubnet=" + sourceSubnet
+						+ ", sourceHost=" + sourceHost + "]";
+			}
+			 
+			 
+		}
+		@Getter @Setter
+		static class Fields {
+			
+			public Fields() {
+				
+			}
+			
+			@Override
+			public String toString() {
+				return "Fields []";
+			}
+			 
+		 }
+		@Getter @Setter
+		public static class Data{
+			
+				@JsonProperty("sig")
+			 	private Sig sig;
+				
+				@JsonProperty("norm_sig")
+				private NormSig normSig;
+				
+				@JsonProperty("alert_id")
+				private String dataAlertId;
+				
+				@JsonProperty("thirdpartytype")
+				private String dataThirdPartyType;
+				
+				@JsonProperty("action")
+				private String dataAction;
+				
+				@JsonProperty("src_ip")
+				private String dataSourceIP;
+				
+				@JsonProperty("dst_ip")
+				private String dataDestinationIP;
+				
+				@JsonProperty("src_port")
+				private String dataSourcePort;
+				
+				@JsonProperty("dst_port")
+				private String dataDestinationPort;
+				
+				@JsonProperty("protocol")
+				private String dataProtocol;
+				
+				@JsonProperty("src_mac")
+				private String dataSourceMAC;
+				
+				@JsonProperty("dst_mac")
+				private String dataDestinationMAC;
+				
+				@JsonProperty("firsttime")
+				private String dataFirstTime;
+				
+				@JsonProperty("lasttime")
+				private String dataLastTime;
+				
+				@JsonProperty("writetime")
+				private String dataWriteTime;
+				
+				@JsonProperty("src_guid")
+				private String dataSourceGuid;
+				
+				@JsonProperty("dst_guid")
+				private String dataDestinationGuid;
+				
+				@JsonProperty("total_severity")
+				private String dataTotalSeverity;
+				
+				@JsonProperty("severity")
+				private String dataSeverity;
+				
+				@JsonProperty("eventcount")
+				private String dataEventCount;
+				
+				@JsonProperty("flow")
+				private String dataFlow;
+				
+				@JsonProperty("vlan")
+				private String dataVlan;
+				
+				@JsonProperty("sequence")
+				private String dataSequence;
+				
+				@JsonProperty("trusted")
+				private String dataTrusted;
+				
+				@JsonProperty("session_id")
+				private String dataSessionId;
+				
+				@JsonProperty("compression_level")
+				private String dataCompressionLevel;
+				
+				@JsonProperty("reviewed")
+				private String dataReviewed;
+				
+				@JsonProperty("AppID")
+				private String dataAppId;
+				
+				@JsonProperty("DomainID")
+				private String dataDomainID;
+				
+				@JsonProperty("HostID")
+				private String dataHostId;
+				
+				@JsonProperty("ObjectID")
+				private String dataObjectId;
+				
+				@JsonProperty("UserIDSrc")
+				private String dataUserIdSrc;
+				
+				@JsonProperty("Security_ID")
+				private String dataSecurityId;
+				
+				@JsonProperty("Process_Name")
+				private String dataProcessName;
+				
+				@JsonProperty("Logon_Type")
+				private String dataLogonType;
+				
+				@JsonProperty("Source_Logon_ID")
+				private String dataSourceLogonId;
+				
+				@JsonProperty("Destination_Logon_ID")
+				private String dataDestinationLogonId;
+				
+				@JsonProperty("Access_Privileges")
+				private String dataAccessPrivileges;
+				
+				@JsonProperty("Request_Type")
+				private String dataRequestType;
+				
+				@JsonProperty("Access_Mask")
+				private String dataAccessMask;
+				
+				
+
+				
+				
+				public Data() {
+					
+				}
+				
+				
+				@Getter @Setter
+				public static class Sig {
+					
+					@JsonProperty("id")
+					private String dataSigId;
+					
+					@JsonProperty("name")
+					private String dataSigName;
+					
+					public Sig() {
+						
+					}
+					
+					public Sig(String dataSigId, String dataSigName) {
+						super();
+						this.dataSigId = dataSigId;
+						this.dataSigName = dataSigName;
+					}
+
+
+					@Override
+					public String toString() {
+						return "\n dataSigId=" + dataSigId + ",\n dataSigName=" + dataSigName;
+					}
+				}
+				@Getter @Setter
+				public static class NormSig {
+					
+					@JsonProperty("id")
+					private String dataNormSigId;
+					
+					@JsonProperty("name")
+					private String dataNormSigName;
+					
+					public NormSig() {
+						
+					}
+					
+					@Override
+					public String toString() {
+						return "\n dataNormSigId=" + dataNormSigId + ",\n dataNormSigName=" + dataNormSigName;
+					}
+
+					public NormSig(String dataNormSigId, String dataNormSigName) {
+						super();
+						this.dataNormSigId = dataNormSigId;
+						this.dataNormSigName = dataNormSigName;
+					}
+				}
+		 }
+}
+
+	
+
+

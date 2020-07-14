@@ -1,0 +1,219 @@
+spring:
+    cloud:
+        stream:
+            kafka:
+                binder:
+                   brokers: localhost:9092
+                   autoCreateTopics: true
+            bindings:
+                appContainerPerformanceOutput:
+                  destination: appContainerPerformance
+                appContainerPerformanceInput:
+                  destination: appContainerPerformance
+                businessActivityOutput:
+                  destination: businessActivity
+                businessActivityInput:
+                  destination: businessActivity
+                directActivityOutput:
+                  destination: directActivity
+                directActivityInput:
+                  destination: directActivity
+                distributedNotificationStreamMessageOutput:
+                  destination: distributedNotification
+                distributedNotificationStreamMessageInput:
+                  destination: distributedNotification
+                exceptionActivityOutput:
+                  destination: exceptionActivity
+                exceptionActivityInput:
+                  destination: exceptionActivity
+                infraContainerPerformanceOutput:
+                  destination: infraContainerPerformance
+                infraContainerPerformanceInput:
+                  destination: infraContainerPerformance
+                notificationActivityOutput:
+                  destination: notificationActivity
+                notificationActivityInput:
+                  destination: notificationActivity
+                securityActivityOutput:
+                  destination: securityActivity
+                securityActivityInput:
+                  destination: securityActivity
+                traceActivityOutput:
+                  destination: traceActivity
+                traceActivityInput:
+                  destination: traceActivity
+                  group: traceActivityGroup
+                network_data_landing_stream_input:
+                  destination: network_data_landing
+                network_data_landing_stream_output:
+                  destination: network_data_landing
+                network_data_sourcing_stream_input:
+                  destination: network_data_sourcing
+                network_data_sourcing_stream_output:
+                  destination: network_data_sourcing
+                network_data_enrichment_stream_input:
+                  destination: network_data_enrichment
+                network_data_enrichment_stream_output:
+                  destination: network_data_enrichment
+                network_data_ai_stream_input:
+                  destination: network_data_ai
+                network_data_ai_stream_output:
+                  destination: network_data_ai
+                network_data_sor_stream_input:
+                  destination: network_data_sor
+                network_data_sor_stream_output:
+                  destination: network_data_sor
+                network_data_indexing_stream_input:
+                  destination: network_data_indexing
+                network_data_indexing_stream_output:
+                  destination: network_data_indexing
+     
+    sleuth:
+        sampler:
+            percentage: 1.0
+    data:
+      cassandra:
+        contact-points: localhost
+        port: 9042
+
+management:
+  add-application-context-header: false
+  endpoints:
+    web:
+      exposure:
+         include: bindings
+  
+eureka:
+  instance:
+    hostname: localhost
+    prefer-ip-address: false
+    instanceId: ${spring.application.name}:${random.value}    
+  client:
+   serviceUrl:
+     defaultZone: http://localhost:8006/eureka/
+service:  
+  auth:
+    jwt:
+      token : SERVICE_JWT_AUTH_TOKEN
+    kerberos:
+      ticker:
+        header: Authorization
+  metrics:
+    logger:
+      delay:
+        in:
+          seconds: 10
+  business:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true   
+  exception:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true
+  security:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true
+  bean:
+    perf:
+      activity:
+        stream:  LOG
+        file:
+          storage:  true
+        db:
+          storage:  true
+        elk:
+          storage:  true
+  app:
+    container:
+      performance:
+        activity:
+          stream:  LOG
+          file:
+            storage:  true
+          db:
+            storage:  true
+          elk:
+            storage:  true 
+  infra:
+    container:
+      performance:
+        activity:
+          stream:  LOG
+          file:
+            storage:  true
+          db:
+            storage:  true
+          elk:
+            storage:  true 
+  trace:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true
+  notification:
+    activity:
+      stream:  LOG
+      file:
+        storage:  true
+      db:
+        storage:  true
+      elk:
+        storage:  true
+  event:
+    handler:
+      round:
+        robbin:
+          instance:
+            count:  10      
+  ride:
+    bid:
+      mgmt:
+        enabled:
+          country: US
+          state:  FL
+        activity:
+          stream: LOG  
+jwt:
+    expiration:
+        in:
+            minutes: 60
+    header: jwt_token
+    route:
+        authentication:
+            refresh: refresh
+    secret: jwt_secret
+    
+elk:
+  enabled: false
+  cluster:
+    enabled:  false
+    name: smartrideMsaElasticCluster
+  local:
+    host: localhost
+    port: 9300
+repository:
+  enabled:  true
+
+
+

@@ -1,0 +1,23 @@
+# config service spring application specific bootstrap configutration
+spring:
+  application:
+    name: config-service
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/shared
+  profiles:
+     active: native 
+# config service eureka client specific bootstrap configutration
+eureka:
+  client:
+    enabled:  false 
+    registerWithEureka: false
+    fetchRegistry: false
+
+# config service service specific bootstrap configutration    
+server:
+  context-path: /configService
+  port: 9000
+

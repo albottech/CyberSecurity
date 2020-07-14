@@ -1,0 +1,35 @@
+CACHE:
+    CLOSE:
+        INDICATOR: true
+    COPY:
+        'ON':
+            READ: true
+    CRITICAL:
+        HEAP:
+            PERCENTAGE: 70
+    ENABLE:
+        AUTO:
+            CORRECT: true
+    EVICTION:
+        HEAP:
+            PERCENTAGE: 60
+    LOCK:
+        LEASE: 120
+        TIMEOUT: 60
+    MESSAGE:
+        SYNC:
+            INTERVAL: 1
+    PDX:
+        IGNORE:
+            UNREAD:
+                FIELDS: true
+        PERSISTENT: true
+        READ:
+            SERIALIZED: false
+    SEARCH:
+        TIMEOUT: 300
+    USE:
+        CLUSTER:
+            CONFIGURATION: false
+    LAZY:
+      INIT: false

@@ -1,0 +1,28 @@
+ktab -l -k kumar.keytab
+
+
+kinit.exe -J-Dsun.security.krb5.debug=true -J-D"java.security.krb5.conf=C:\msa\keytab\krb5.ini" -k -t ad.keytab http/dev.api.glider.metlife.com@METNET.NET
+
+
+klist
+
+
+ldapsearch -H ldap://ldapadus.metnet.net -x -b "" -s base -LLL supportedSASLMechanisms
+
+supportedSASLMechanisms: GSSAPI
+supportedSASLMechanisms: GSS-SPNEGO
+supportedSASLMechanisms: EXTERNAL
+supportedSASLMechanisms: DIGEST-MD5
+
+ldapsearch -LLL -O maxssf=0 -Y GSSAPI -H ldap://ldapadus.metnet.net -b "DC=NET,DC=ORG,DC=COM"
+
+
+
+ldapsearch -LLL -O maxssf=0 -Y GSSAPI -H ldap://ldapadus.metnet.net -b "DC=NET,DC=ORG,DC=COM"
+
+
+Remote system start option enabler
+
+From RDP use ctrl + alt + end (twice) 
+Select the Task Manager
+File -> Run new task (I entered "explorer.exe" in the open text box)

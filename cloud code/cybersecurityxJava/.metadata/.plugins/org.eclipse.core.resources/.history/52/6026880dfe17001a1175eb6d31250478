@@ -1,0 +1,7 @@
+package io.kryptoblocks.msa.network.stream.service.business;
+
+import io.kryptoblocks.msa.network.stream.service.ElasticSearch.NetworkSourcingModelElasticSearch;
+
+public interface NetworkSaveDataElasticSearch {
+		public void saveDatatoElasticSearch(List<NetworkSourcingModelElasticSearch> siemNetworkDataSourcingModelListES);
+}

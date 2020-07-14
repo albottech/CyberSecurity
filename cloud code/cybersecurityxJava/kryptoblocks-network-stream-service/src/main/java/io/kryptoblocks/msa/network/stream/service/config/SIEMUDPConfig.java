@@ -1,0 +1,56 @@
+package io.kryptoblocks.msa.network.stream.service.config;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.ip.udp.UnicastReceivingChannelAdapter;
+
+import io.kryptoblocks.msa.network.stream.service.udp.SIEMUDPServer;
+
+
+@Configuration 
+@ConditionalOnExpression("${udp.siem.listener.enabled}")
+public class SIEMUDPConfig {
+	    
+		/** The Constant LOGGER. */
+		private final static Logger LOGGER = LoggerFactory.getLogger(SIEMUDPConfig.class);
+		
+		/** The udp port. */
+		@Value("${udp.siem.listener.port}")
+		private int siemudpPort;
+		
+
+		/**
+		 * UDP server.
+		 *
+		 * @return the UDP server
+		 */
+		@Bean
+		public SIEMUDPServer SIEMUDPServer() {
+			LOGGER.info("udp listner config is enabled @ port:{}", siemudpPort);
+			return new SIEMUDPServer();
+			
+		}
+		 
+		/**
+		 * Process uni cast udp message.
+		 *
+		 * @return the integration flow
+		 */
+		@Bean
+		  public IntegrationFlow processUniCastUdpMessage() {
+		    return IntegrationFlows
+		      .from(new UnicastReceivingChannelAdapter(siemudpPort))
+		      .handle("SIEMUDPServer", "handleMessage")
+		      .get();
+		}
+		
+
+
+}
+

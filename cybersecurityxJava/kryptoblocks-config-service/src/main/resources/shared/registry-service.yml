@@ -1,0 +1,28 @@
+log:
+  path:
+    txt:
+      location: /log/
+      file:
+        name: txt-log.txt
+      performance:
+        metric:
+          file:
+            name: performance-metric-txt-log.txt
+      exception:
+        metric:
+          file:
+            name: exception-metric-txt-log.txt
+      trace:
+        metric:
+          file:
+            name: trace-metric-txt-log.txt
+      business:
+        metric:
+          file:
+            name: business-metric-txt-log.txt
+            
+    json:
+      location: /log/
+      file:
+        name: json-log.json
+  

@@ -1,0 +1,214 @@
+package io.kryptoblocks.msa.stream.service.pojos;
+
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class SIEMRecievedJSONModel {
+
+	   @JsonProperty("source")
+		public Source source;
+
+		@JsonProperty("fields")
+		public Fields fields;
+
+		@JsonProperty("data")
+		public Data data;
+		
+		
+		
+		@Override
+		public String toString() {
+			return "\nMcAfeeSiem \n\nSource-->" + source + ",\n\nFields -->\n" + fields + ",\n\nData-->" + data + "]";
+		}
+	}
+
+	class Fields {
+		@Override
+		public String toString() {
+			return "Fields []";
+		}
+	}
+
+	class Source {
+		@JsonProperty("id")
+		public String sourceId;
+
+		@JsonProperty("name")
+		public String sourceName;
+
+		@JsonProperty("subnet")
+		public String sourceSubnet;
+
+		@JsonProperty("host")
+		public String sourceHost;
+
+		@Override
+		public String toString() {
+			return "\nsourceId=" + sourceId + ",\n sourceName=" + sourceName + ",\n sourceSubnet=" + sourceSubnet
+					+ ",\n sourceHost=" + sourceHost;
+		}
+
+	}
+
+	class Data {
+		@JsonProperty("sig")
+		public Sig sig;
+
+		@JsonProperty("norm_sig")
+		public NormSig normSig;
+
+		@JsonProperty("alert_id")
+		public String dataAlertId;
+
+		@JsonProperty("thirdpartytype")
+		public String dataThirdPartyType;
+
+		@JsonProperty("action")
+		public String dataAction;
+
+		@JsonProperty("src_ip")
+		public String dataSourceIP;
+
+		@JsonProperty("dst_ip")
+		public String dataDestinationIP;
+
+		@JsonProperty("src_port")
+		public String dataSourcePort;
+
+		@JsonProperty("dst_port")
+		public String dataDestinationPort;
+
+		@JsonProperty("protocol")
+		public String dataProtocol;
+
+		@JsonProperty("src_mac")
+		public String dataSourceMAC;
+
+		@JsonProperty("dst_mac")
+		public String dataDestinationMAC;
+
+		@JsonProperty("firsttime")
+		public String dataFirstTime;
+
+		@JsonProperty("lasttime")
+		public String dataLastTime;
+
+		@JsonProperty("writetime")
+		public String dataWriteTime;
+
+		@JsonProperty("src_guid")
+		public String dataSourceGuid;
+
+		@JsonProperty("dst_guid")
+		public String dataDestinationGuid;
+
+		@JsonProperty("total_severity")
+		public String dataTotalSeverity;
+
+		@JsonProperty("severity")
+		public String dataSeverity;
+
+		@JsonProperty("eventcount")
+		public String dataEventCount;
+
+		@JsonProperty("flow")
+		public String dataFlow;
+
+		@JsonProperty("vlan")
+		public String dataVlan;
+
+		@JsonProperty("sequence")
+		public String dataSequence;
+
+		@JsonProperty("trusted")
+		public String dataTrusted;
+
+		@JsonProperty("session_id")
+		public String dataSessionId;
+
+		@JsonProperty("compression_level")
+		public String dataCompressionLevel;
+
+		@JsonProperty("reviewed")
+		public String dataReviewed;
+
+		@JsonProperty("AppID")
+		public String dataAppId;
+
+		@JsonProperty("DomainID")
+		public String dataDomainID;
+
+		@JsonProperty("HostID")
+		public String dataHostId;
+
+		@JsonProperty("ObjectID")
+		public String dataObjectId;
+
+		@JsonProperty("UserIDSrc")
+		public String dataUserIdSrc;
+
+		@JsonProperty("Security_ID")
+		public String dataSecurityId;
+
+		@JsonProperty("Process_Name")
+		public String dataProcessName;
+
+		@JsonProperty("Logon_Type")
+		public String dataLogonType;
+
+		@JsonProperty("Source_Logon_ID")
+		public String dataSourceLogonId;
+
+		@JsonProperty("Destination_Logon_ID")
+		public String dataDestinationLogonId;
+
+		@Override
+		public String toString() {
+			return "\nsig-->" + sig + ",\n\nnormSig-->" + normSig + ",\n\n dataAlertId=" + dataAlertId
+					+ ",\n dataThirdPartyType=" + dataThirdPartyType + ",\n dataAction=" + dataAction + ",\n dataSourceIP="
+					+ dataSourceIP + ",\n dataDestinationType=" + dataDestinationIP + ",\n dataSourcePort="
+					+ dataSourcePort + ",\n dataDestinationPort=" + dataDestinationPort + ",\n dataProtocol=" + dataProtocol
+					+ ",\n dataSourceMAC=" + dataSourceMAC + ",\n dataDestinationMAC=" + dataDestinationMAC
+					+ ",\n dataFirstTime=" + dataFirstTime + ",\n dataLastTime=" + dataLastTime + ",\n dataWriteTime="
+					+ dataWriteTime + ",\n dataSourceGuid=" + dataSourceGuid + ",\n dataDestinationGuid="
+					+ dataDestinationGuid + ",\n dataTotalSeverity=" + dataTotalSeverity + ",\n dataSeverity="
+					+ dataSeverity + ",\n dataEventCount=" + dataEventCount + ",\n dataFlow=" + dataFlow + ",\n dataVlan="
+					+ dataVlan + ",\n dataSequence=" + dataSequence + ",\n dataTrusted=" + dataTrusted
+					+ ",\n dataSessionId=" + dataSessionId + ",\n dataCompressionLevel=" + dataCompressionLevel
+					+ ",\n dataReviewed=" + dataReviewed + ",\n dataAppId=" + dataAppId + ",\n dataDomainID=" + dataDomainID
+					+ ",\n dataHostId=" + dataHostId + ",\n dataObjectId=" + dataObjectId + ",\n dataUserIdSrc="
+					+ dataUserIdSrc + ",\n dataSecurityId=" + dataSecurityId + ",\n dataProcessName=" + dataProcessName
+					+ ",\n dataLogonType=" + dataLogonType + ",\n dataSourceLogonId=" + dataSourceLogonId
+					+ ",\n dataDestinationLogonId=" + dataDestinationLogonId;
+		}
+
+	}
+
+	class Sig {
+		@JsonProperty("id")
+		public String dataSigId;
+
+		@JsonProperty("name")
+		public String dataSigName;
+
+		@Override
+		public String toString() {
+			return "\n dataSigId=" + dataSigId + ",\n dataSigName=" + dataSigName;
+		}
+
+	}
+
+	class NormSig {
+		@JsonProperty("id")
+		public String dataNormSigId;
+
+		@JsonProperty("name")
+		public String dataNormSigName;
+
+		@Override
+		public String toString() {
+			return "\n dataNormSigId=" + dataNormSigId + ",\n dataNormSigName=" + dataNormSigName;
+		}
+
+
+}

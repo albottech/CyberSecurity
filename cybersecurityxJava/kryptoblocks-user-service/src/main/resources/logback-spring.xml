@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!-- universal log configuration, if necessary change only the log destination folder, please do not eliminate any defined appended or logger -->
+	<include resource="org/springframework/boot/logging/logback/base.xml" />
+	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>	
+	<property name="CONSOLE_LOG_PATTERN"
+			  value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+	
+	
+	<springProperty scope="context" name="serviceName" source="spring.application.name" defaultValue="user-service"/>	
+	<springProperty scope="context" name="serviceHost" source="spring.cloud.client.hostname" defaultValue="###"/>
+	<springProperty scope="context" name="servicePort" source="server.port" defaultValue="###"/>	
+	
+	 
+	<springProperty scope="context" name="logLocation" source="log.path.txt.location" defaultValue="/log/"/>
+   	<springProperty scope="context" name="logTextFileName" source="log.path.txt.file.name" defaultValue="log.txt"/>
+   	<springProperty scope="context" name="logJsonFileName" source="log.path.json.file.name" defaultValue="log.json"/>
+   	
+   	<property name="METRIC_LOG_PATTERN" value="%m%n%wex"/>   	
+   	<springProperty scope="context" name="performanceMetricFileName" source="performance.metric.file.name" defaultValue="performance-metric.json"/>   	
+   	<springProperty scope="context" name="exceptionMetricFileName" source="exception.metric.file.name" defaultValue="exception-metric.json"/>   	
+   	<springProperty scope="context" name="traceMetricFileName" source="trace.metric.file.name" defaultValue="trace-metric.json"/>   	
+   	<springProperty scope="context" name="businessMetricFileName" source="busines.activity.metric.file.name" defaultValue="business-activity-metric.json"/>   	
+  	   	
+   	
+   	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+   	 <resetJUL>true</resetJUL>
+	</contextListener>
+   	
+   	<appender name="fileTxtAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file> ${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${logTextFileName} </file>
+      <encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder>
+      <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <maxIndex>1</maxIndex>
+            <fileNamePattern>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${logTextFileName}.%i</fileNamePattern>
+      </rollingPolicy>
+      <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+      </triggeringPolicy>
+   </appender>
+    
+    <appender name="fileJsonAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${logJsonFileName}</File>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <maxIndex>1</maxIndex>
+            <fileNamePattern>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${logJsonFileName}.%i</fileNamePattern>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+			<providers>
+				<timestamp>
+					<timeZone>UTC</timeZone>
+				</timestamp>
+				<pattern>
+					<pattern>
+						{
+						"severity": "%level",
+						"service": "${serviceName:-}",
+						"trace": "%X{X-B3-TraceId:-}",
+						"span": "%X{X-B3-SpanId:-}",
+						"parent": "%X{X-B3-ParentSpanId:-}",
+						"exportable": "%X{X-Span-Export:-}",
+						"pid": "${PID:-}",
+						"thread": "%thread",
+						"class": "%logger{40}",
+						"rest": "%message"
+						}
+					</pattern>
+				</pattern>
+			</providers>
+		</encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+    
+    <appender name="consoleJsonAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+    
+    <appender name="consoleDefaultAppender" class="ch.qos.logback.core.ConsoleAppender">        
+      <filter class="ch.qos.logback.classic.filter.LevelFilter"> 
+         <level>DEBUG</level> 
+         <onMatch>ACCEPT</onMatch> 
+         <onMismatch>DENY</onMismatch> 
+      </filter>   
+      <encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder> 
+   </appender>
+   
+     
+   <appender name="performanceMetricFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${METRIC_LOG_PATTERN}</pattern>
+		</encoder>
+		<file>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${performanceMetricFileName}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${performanceMetricFileName}.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	
+	<appender name="exceptionMetricFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${METRIC_LOG_PATTERN}</pattern>
+		</encoder>
+		<file>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${exceptionMetricFileName}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${exceptionMetricFileName}.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	
+	<appender name="traceMetricFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${METRIC_LOG_PATTERN}</pattern>
+		</encoder>
+		<file>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${traceMetricFileName}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${traceMetricFileName}.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	
+	<appender name="businessMetricFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${METRIC_LOG_PATTERN}</pattern>
+		</encoder>
+		<file>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${businessMetricFileName}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${logLocation}${serviceName}/${serviceName}-${serviceHost}-${servicePort}-${businessMetricFileName}.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+    
+    <logger name="PerformanceMetricLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="performanceMetricFileAppender"/>
+    </logger>
+    
+    <logger name="ExceptionMetricLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="exceptionMetricFileAppender"/>
+    </logger>
+    
+    <logger name="TraceMetricLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="traceMetricFileAppender"/>
+    </logger>
+    
+    <logger name="BusinessMetricLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="businessMetricFileAppender"/>
+    </logger>
+    
+    <logger name="com.smartride.msa" level="DEBUG" />      
+    <logger name="org.springframework.data.geode" level="DEBUG" /> 
+      
+    
+    <root level="info">         
+         <appender-ref ref="fileJsonAppender"/>
+         <appender-ref ref="fileTxtAppender"/> 
+         <appender-ref ref="consoleDefaultAppender"/>
+    </root>   
+    
+</configuration>

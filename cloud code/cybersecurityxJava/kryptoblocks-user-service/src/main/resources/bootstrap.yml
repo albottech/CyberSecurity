@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: user-service
+  cloud:
+    config:
+      uri: http://localhost:9000/configService
+      fail-fast: true
+server:
+  context-path: /userService  
+  port: 9700
+  

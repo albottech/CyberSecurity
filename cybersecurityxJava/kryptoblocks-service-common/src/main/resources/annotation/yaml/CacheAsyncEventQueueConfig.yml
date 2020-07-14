@@ -1,0 +1,12 @@
+ASYNC:
+    EVENT:
+        QUEUE:
+            BATCH:
+                SIZE: 10
+            DISPATCHER:
+                THREADS: 4
+            MAX:
+                QUEUE:
+                    MEMORY: 50
+            PARALLEL: false
+            PERSISTENT: true

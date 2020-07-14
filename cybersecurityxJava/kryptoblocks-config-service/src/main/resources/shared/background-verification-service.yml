@@ -1,0 +1,22 @@
+server:
+  context-path: /bckVrfDsptService
+log:
+  path:
+    txt:
+      location: /log/
+      file:
+        name: log.txt
+    json:
+      location: /log/
+      file:
+        name: log.json
+
+event:
+  path:
+    location: /log/
+   
+   
+    
+      
+      
+      

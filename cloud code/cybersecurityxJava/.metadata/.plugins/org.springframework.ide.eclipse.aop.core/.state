@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aop-reference-model>
+<aop-project name="kryptoblocks-udp-listner-service"/>
+<aop-project name="kryptoblocks-gateway-service"/>
+<aop-project name="kryptoblocks-stream-producer-service">
+<aspect-definition advice-class-name="org.springframework.cloud.sleuth.instrument.scheduling.TraceSchedulingAspect" advice-method-name="traceBackgroundThread(org.aspectj.lang.ProceedingJoinPoint)" advice-type="AROUND" aspect-end-line-number="-1" aspect-name="traceSchedulingAspect" aspect-start-line-number="-1" factory-id="org.springframework.ide.eclipse.aop.core.annotationAspectDefinitionElementFactory" file="/kryptoblocks-stream-producer-service/src/main/java/io/kryptoblocks/msa/direct/stream/service/DirectStreamProducerApplication.java" pointcut-expression="execution (@org.springframework.scheduling.annotation.Scheduled  * *.*(..))" proxy-target-class="true">
+<aop-reference advice-type="AROUND" bean="1:BeansModel|2:kryptoblocks-stream-producer-service|3:java:io.kryptoblocks.msa.direct.stream.service.DirectStreamProducerApplication|8:messageProduceScheduler:16" bean-file="/kryptoblocks-stream-producer-service/src/main/java/io/kryptoblocks/msa/direct/stream/service/config/StreamProducerConfig.java" bean-start-line="16" factory-id="org.springframework.ide.eclipse.aop.core.aopReferenceElementFactory" file="/kryptoblocks-stream-producer-service/src/main/java/io/kryptoblocks/msa/direct/stream/service/DirectStreamProducerApplication.java" source="=kryptoblocks-security-service/C:\/Users\/nehagirdhar\/.m2\/repository\/org\/springframework\/cloud\/spring-cloud-sleuth-core\/1.2.2.RELEASE\/spring-cloud-sleuth-core-1.2.2.RELEASE.jar&lt;org.springframework.cloud.sleuth.instrument.scheduling(TraceSchedulingAspect.class[TraceSchedulingAspect~traceBackgroundThread~Lorg.aspectj.lang.ProceedingJoinPoint;" source-start-line="-1" target="=kryptoblocks-stream-producer-service/src\/main\/java&lt;io.kryptoblocks.msa.direct.stream.service.scheduling{MessageProduceScheduler.java[MessageProduceScheduler~sendMessage" target-start-line="16"/>
+</aspect-definition>
+</aop-project>
+<aop-project name="kryptoblocks-user-repository"/>
+<aop-project name="kryptoblocks-service-common"/>
+<aop-project name="kryptoblocks-siem-repository"/>
+<aop-project name="kryptoblocks-stream-consumer-service"/>
+<aop-project name="kryptoblocks-index-service"/>
+<aop-project name="kryptoblocks-app-repository"/>
+<aop-project name="kryptoblocks-data-repository"/>
+<aop-project name="kryptoblocks-user-service"/>
+<aop-project name="kryptoblocks-network-repository"/>
+<aop-project name="kryptoblocks-infra-repository"/>
+<aop-project name="kryptoblocks-security-service"/>
+<aop-project name="kryptoblocks-network-stream-service"/>
+<aop-project name="kryptoblocks-config-service"/>
+<aop-project name="kryptoblocks-siem-stream-service"/>
+</aop-reference-model>

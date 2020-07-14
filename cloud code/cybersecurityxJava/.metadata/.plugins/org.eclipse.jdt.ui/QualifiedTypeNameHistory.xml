@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.udp.SIEMUDPServer"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.business.SIEMDataLandingListener"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.business.impl.SIEMDataLandingListenerImpl"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.siem.McafeeSIEMDecoder"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.netflow.netflowv9.NetFlowV9Decoder"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.netflow.netflowv5.NetFlowv5Decoder"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.stream.service.pojos.SIEMRecievedJSONModel"/>
+<fullyQualifiedTypeName name="com.google.gson.annotations.SerializedName"/>
+<fullyQualifiedTypeName name="com.google.gson.annotations.Expose"/>
+<fullyQualifiedTypeName name="scala.util.parsing.json.JSONObject"/>
+<fullyQualifiedTypeName name="com.gemstone.org.json.JSONObject"/>
+<fullyQualifiedTypeName name="java.util.Set"/>
+<fullyQualifiedTypeName name="org.json.simple.JSONObject"/>
+<fullyQualifiedTypeName name="net.minidev.json.JSONObject"/>
+<fullyQualifiedTypeName name="com.fasterxml.jackson.annotation.JsonAnySetter"/>
+<fullyQualifiedTypeName name="java.util.LinkedHashMap"/>
+<fullyQualifiedTypeName name="java.util.Map"/>
+<fullyQualifiedTypeName name="org.elasticsearch.ElasticsearchException"/>
+<fullyQualifiedTypeName name="com.google.gson.Gson"/>
+<fullyQualifiedTypeName name="org.springframework.beans.factory.annotation.Autowired"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.udp.SIEMRecievedJSONModel"/>
+<fullyQualifiedTypeName name="lombok.Getter"/>
+<fullyQualifiedTypeName name="lombok.Setter"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.ElasticSearch.NetworkSourcingModelElasticSearch"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.business.NetworkSaveDataElasticSearch"/>
+<fullyQualifiedTypeName name="io.kryptoblocks.msa.network.stream.service.business.impl.NetworkSaveDataElasticSearchImpl"/>
+</qualifiedTypeNameHistroy>

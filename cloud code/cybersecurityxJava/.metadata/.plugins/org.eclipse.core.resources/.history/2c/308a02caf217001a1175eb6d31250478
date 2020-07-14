@@ -1,0 +1,5 @@
+package io.kryptoblocks.msa.network.repository.model;
+
+public class NetworkSourcingModelElasticSearch {
+
+}

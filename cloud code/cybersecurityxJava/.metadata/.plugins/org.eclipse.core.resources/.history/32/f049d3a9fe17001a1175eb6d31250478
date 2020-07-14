@@ -1,0 +1,56 @@
+package io.kryptoblocks.msa.network.stream.service.business.impl;
+
+import java.util.List;
+
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.kryptoblocks.msa.network.stream.service.ElasticSearch.NetworkSourcingModelElasticSearch;
+import io.kryptoblocks.msa.network.stream.service.business.NetworkSaveDataElasticSearch;
+
+
+
+public class NetworkSaveDataElasticSearchImpl implements NetworkSaveDataElasticSearch{
+	
+	/** The Constant LOGGER. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(NetworkSaveDataElasticSearchImpl.class);
+	
+	ObjectMapper objectMapper = new ObjectMapper();
+	
+	
+	
+	@Override
+	public void saveDatatoElasticSearch(List<NetworkSourcingModelElasticSearch> siemNetworkDataSourcingModelListES) {
+		//saving to the ElasticSearch
+		for(NetworkSourcingModelElasticSearch model : siemNetworkDataSourcingModelListES) {						  
+		
+		   try {    							  
+			  String jsonString = objectMapper.writeValueAsString(model);		   
+				  
+			  //IndexRequest indexRequest = new IndexRequest("kryptoblocks_networksourcedata")
+					  // .source(convertObjectToMap(model),XContentType.JSON);
+			  IndexRequest indexRequest = new IndexRequest("kryptoblocks_networksourcedata").source(jsonString, XContentType.JSON);				
+	 		   //Synchronous execution
+	 		   IndexResponse indexResponse = restClient.index(indexRequest, RequestOptions.DEFAULT);
+			   LOGGER.info("index response{}",indexResponse.getResult().name());
+ 		     }
+ 		     catch(ElasticsearchException e) {			 		       
+ 		    	 LOGGER.info("in NetworkDataLandingListenerServiceImpl ElasticsearchException{}",e);
+ 		     }
+		     catch(Exception e) {
+		    	 LOGGER.info("in NetworkDataLandingListenerServiceImpl exception{}",e);
+		      }
+						
+			}
+
+		
+	}
+
+}

@@ -1,0 +1,15 @@
+version: '3'
+
+# Shared network
+networks:
+  msa-network:
+    # Use a custom driver
+    driver: msa-driver
+    
+services:
+  stream-consumer-service:
+    build: .
+    ports:
+     - "7050:7050"
+    networks:
+      - msa-network

@@ -1,0 +1,26 @@
+SERVER:
+    AUTO:
+        STARTUP: true
+    BIND:
+        ADDRESS: LOCALHOST
+    GROUPS: DATA_CACHE_SERVER_GROUP
+    HOST:
+        FOR:
+            CLIENTS: LOCALHOST
+    LOCK:
+        POLL:
+            INTERVAL: 2000
+    MAX:
+        CONNECTIONS: 500
+        MESSAGE:
+            COUNT: 10000
+        THREADS: 64
+        TIME:
+            BETWEEN:
+                PINGS: 30000
+    PORT:
+      MIN:
+        VALUE:  40404
+      MAX:
+        VALUE:  40604
+        

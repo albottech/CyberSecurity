@@ -1,0 +1,10 @@
+version: '3'
+services:
+  gateway-service:
+    build: .
+    ports:
+     - "9100:9100"
+networks:
+  default:
+    external:
+      name: metlife-msa-network

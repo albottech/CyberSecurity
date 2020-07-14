@@ -1,0 +1,15 @@
+version: '3'
+
+# Shared network
+networks:
+  smartride-msa-network:
+    # Use a custom driver
+    driver: smartride-msa-driver
+    
+services:
+  config-service:
+    build: .
+    ports:
+     - "9000:9000"
+    networks:
+      - smartride-msa-network

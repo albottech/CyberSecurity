@@ -1,0 +1,31 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+	https://raw.github.com/impetus-opensource/Kundera/Kundera-2.0.4/kundera-core/src/test/resources/META-INF/persistence_2_0.xsd"
+	version="2.0">
+	<persistence-unit name="cassandra_app">
+		<provider>com.impetus.kundera.KunderaPersistence</provider>	
+		<class>io.kryptoblocks.msa.app.repository.model.AppDataAIModel</class>	
+		<class>io.kryptoblocks.msa.app.repository.model.AppDataEnrichmentModel</class>	
+		<class>io.kryptoblocks.msa.app.repository.model.AppDataIndexModel</class>
+		<class>io.kryptoblocks.msa.app.repository.model.AppDataProcessActivityModel</class>
+		<class>io.kryptoblocks.msa.app.repository.model.AppDataSORModel</class>	
+		<class>io.kryptoblocks.msa.app.repository.model.AppDataSourcingModel</class>		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>	
+		<properties>
+			<property name="kundera.show.query" value="true" />
+			<property name="kundera.nodes" value="localhost" />
+			<property name="kundera.port" value="9042" />
+			<property name="kundera.keyspace" value="kryptoblocks_app" />
+			<property name="kundera.ddl.auto.prepare" value="update" />
+			<property name="kundera.pool.size.max.active" value="100" />
+			<property name="kundera.pool.size.max.idle" value="20" />
+			<property name="kundera.pool.size.min.idle" value="10" />
+			<property name="kundera.ddl.auto.prepare" value="update" />		
+			<property name="kundera.dialect" value="cassandra" />	
+			<property name="kundera.client.lookup.class"
+				value="com.impetus.kundera.client.cassandra.dsdriver.DSClientFactory" />
+					
+		</properties>		 
+	</persistence-unit>
+</persistence>

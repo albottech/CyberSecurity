@@ -1,0 +1,47 @@
+package io.kryptoblocks.msa.network.stream.service.business.impl;
+
+import java.util.List;
+
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.common.xcontent.XContentType;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.kryptoblocks.msa.network.stream.service.ElasticSearch.NetworkSourcingModelElasticSearch;
+import io.kryptoblocks.msa.network.stream.service.business.NetworkSaveDataElasticSearch;
+
+ObjectMapper objectMapper = new ObjectMapper();
+
+public class NetworkSaveDataElasticSearchImpl implements NetworkSaveDataElasticSearch{
+
+	@Override
+	public void saveDatatoElasticSearch(List<NetworkSourcingModelElasticSearch> siemNetworkDataSourcingModelListES) {
+		//saving to the ElasticSearch
+		for(NetworkSourcingModelElasticSearch model : siemNetworkDataSourcingModelListES) {						  
+		
+		   try {    							  
+			  String jsonString = objectMapper.writeValueAsString(model);		   
+				  
+			  //IndexRequest indexRequest = new IndexRequest("kryptoblocks_networksourcedata")
+					  // .source(convertObjectToMap(model),XContentType.JSON);
+			  IndexRequest indexRequest = new IndexRequest("kryptoblocks_networksourcedata").source(jsonString, XContentType.JSON);				
+	 		   //Synchronous execution
+	 		   IndexResponse indexResponse = restClient.index(indexRequest, RequestOptions.DEFAULT);
+			   LOGGER.info("index response{}",indexResponse.getResult().name());
+ 		     }
+ 		     catch(ElasticsearchException e) {			 		       
+ 		    	 LOGGER.info("in NetworkDataLandingListenerServiceImpl ElasticsearchException{}",e);
+ 		     }
+		     catch(Exception e) {
+		    	 LOGGER.info("in NetworkDataLandingListenerServiceImpl exception{}",e);
+		      }
+						
+			}
+
+		
+	}
+
+}

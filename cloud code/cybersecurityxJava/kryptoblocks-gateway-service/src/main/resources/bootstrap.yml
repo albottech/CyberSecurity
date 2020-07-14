@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    config:
+      uri: http://localhost:9000/configService
+      fail-fast: true
+
+# disable discovery completly     
+eureka:
+  client:
+    enabled:  false 
+    registerWithEureka: false
+    fetchRegistry: false
+
+# no context path, just provide the port on which the load balancer is mapped
+server:
+  port: 8100

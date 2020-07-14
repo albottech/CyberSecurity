@@ -1,0 +1,10 @@
+server:
+  context-path: /networkStreamService
+  
+elastic:
+  cluster:
+    enabled: true
+    name: elasticsearch
+  local:
+    host: localhost
+    port: 9200

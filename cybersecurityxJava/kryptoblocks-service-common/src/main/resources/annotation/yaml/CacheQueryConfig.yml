@@ -1,0 +1,4 @@
+gemfire:
+    ALLOW_PERSISTENT_TRANSACTIONS: true
+    Query:
+        VERBOSE: true

@@ -1,0 +1,6 @@
+version: '3'
+services:
+  security-service:
+    build: .
+    ports:
+     - "9030:9030"

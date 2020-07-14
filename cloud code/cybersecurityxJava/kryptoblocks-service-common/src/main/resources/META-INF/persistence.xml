@@ -1,0 +1,48 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+	https://raw.github.com/impetus-opensource/Kundera/Kundera-2.0.4/kundera-core/src/test/resources/META-INF/persistence_2_0.xsd"
+	version="2.0">
+	<persistence-unit name="cassandra_nfr">
+		<provider>com.impetus.kundera.KunderaPersistence</provider>		
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.AutoConfigInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.ComponentInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.DataSourceInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.EnvironmentInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.GenericInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.HealthDetailsInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.LogDetailsInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.PropertiesInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.ServletInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.SystemInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.app.statistics.model.ThreadDumpInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.business.activity.model.BusinessActivity</class>
+		<class>io.kryptoblocks.msa.data.nfr.exception.model.ExceptionActivity</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.ChangeInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.ConfigInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.HealthcheckInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.HealthInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.HostConfigInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.InspectionInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.LogInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.NetworkingConfigInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.NetworkSettingsInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.ProcessesInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.ResourceUsageInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.infra.container.statistics.model.StateInfo</class>
+		<class>io.kryptoblocks.msa.data.nfr.notification.model.NotificationActivity</class>
+		<class>io.kryptoblocks.msa.data.nfr.security.model.SecurityActivity</class>
+		<class>io.kryptoblocks.msa.data.nfr.trace.model.Trace</class>
+		<class>io.kryptoblocks.msa.data.nfr.trace.model.TraceSpan</class>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>	
+		<properties>
+			<property name="kundera.nodes" value="localhost" />
+			<property name="kundera.port" value="9042" />
+			<property name="kundera.dialect" value="cassandra" />
+			<property name="kundera.keyspace" value="kryptoblocks_nfr" />
+			<property name="kundera.ddl.auto.prepare" value="update" />
+			<property name="kundera.client.lookup.class"
+				value="com.impetus.kundera.client.cassandra.dsdriver.DSClientFactory" />
+		</properties>		 
+	</persistence-unit>
+</persistence>

@@ -1,0 +1,24 @@
+REGION:
+    DOMAIN:
+        MODEL:
+            PACKAGE: io.kryptoblocks.msa.common.cache.pdx.*
+    STORAGE:
+        AUTO:
+            COMPACT: true
+        DISK:
+            PRIMARY:
+                LOCATION: /region/storage/disk/primary/location/
+                LOCATION.SIZE: 20
+            SECONDARY:
+                LOCATION: /region/storage/disk/secondary/location/
+                LOCATION.SIZE: 20
+        MAX:
+            OPERATION:
+                LOG:
+                    SIZE: 10
+        NUMBER_OF_COPIES: 2
+        PERSISTENCE: true
+        QUEUE:
+            SIZE: 50
+        TIME:
+            INTERVAL: 9999

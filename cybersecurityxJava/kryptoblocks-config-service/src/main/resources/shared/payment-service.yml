@@ -1,0 +1,35 @@
+server:
+  context:
+    path: /paymentService
+log:
+  path:
+    txt:
+      location: /log/
+    file:
+      name: log.txt
+    json:
+      location: /log/
+      file: log.json
+performance:
+  metric:
+    file:
+      name: performance-metric.json
+exception:
+  metric:
+    file:
+      name: exception-metric.json
+trace:
+  metric:
+    file:
+      name: trace-metric.json
+busines:
+  activity:
+    metric:
+      file:
+        name: business-activity-metric.json
+payment:
+  event:
+    recovery:
+      file:
+        name:  payment-event-recovery 
+     

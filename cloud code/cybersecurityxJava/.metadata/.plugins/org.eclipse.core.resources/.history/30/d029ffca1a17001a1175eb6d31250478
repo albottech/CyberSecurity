@@ -1,0 +1,174 @@
+package io.kryptoblocks.msa.network.stream.service.business.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.kryptoblocks.msa.common.exception.BusinessException;
+import io.kryptoblocks.msa.common.util.DateType;
+import io.kryptoblocks.msa.network.repository.impl.NetworkServiceRepository;
+import io.kryptoblocks.msa.network.repository.key.NetworkDataProcessActivityKey;
+import io.kryptoblocks.msa.network.repository.model.NetworkDataProcessActivityModel;
+import io.kryptoblocks.msa.network.repository.model.NetworkDataSourcingModel;
+import io.kryptoblocks.msa.network.stream.service.audit.event.NetworkDataProcessActivityEventService;
+import io.kryptoblocks.msa.network.stream.service.business.NetworkDataLandingListnerService;
+import io.kryptoblocks.msa.network.stream.service.model.NetworkProcessServiceActivity;
+
+public class NetworkDataLandingListnerServiceImpl implements NetworkDataLandingListnerService{
+	
+	/** The Constant LOGGER. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(NetworkDataLandingListnerServiceImpl.class);
+	
+	/** The network service repository. */
+	@Autowired
+	private NetworkServiceRepository networkServiceRepository;
+	
+	/** The network data process activity event service. */
+	@Autowired
+	NetworkDataProcessActivityEventService networkDataProcessActivityEventService;
+	
+	/** The method name. */
+	private String methodName;
+
+	//For elastic search
+	@Autowired
+	private RestHighLevelClient restClient;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
+	
+	
+	/**
+	 * Source network data.
+	 *
+	 * @param networkSourceData the network source data
+	 * @return the network data sourcing model
+	 * @throws BusinessException the business exception
+	 */
+	@Override
+	public NetworkDataSourcingModel sourceNetworkData(List<NetworkDataSourcingModel> networkSourceData) throws BusinessException {
+		LOGGER.info("SourceNetworkData==="+ networkSourceData.toString());
+		NetworkDataSourcingModel returnValue = null;
+		try {
+			methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
+
+			if (networkSourceData != null) {
+				NetworkDataProcessActivityModel networkDataProcessActivityModel = createNetworkDataProcessActivityModel();
+
+				// TODO
+				// convert the input data model to the finalizedNetworkSourcingData using
+				// mapping method.
+				//returnValue = formalizeNetworkDataSourcingModel(networkSourceData);
+
+				if (networkSourceData != null) {
+					networkDataProcessActivityModel.setEndTime(DateType.DATE_FORMAT_WITH_NANO_SECONDS.getValue());
+					networkDataProcessActivityModel.setStatus(NetworkProcessServiceActivity.Status.SUCCESS.getValue());
+					LOGGER.info("about to save data");
+					// save the data to the database
+					networkServiceRepository.saveNetworkDataSourcingModel(networkSourceData);
+				
+					//saving to the ElasticSearch
+					for(NetworkDataSourcingModel model : networkSourceData) {
+						IndexRequest indexRequest = new IndexRequest("kryptoblocks_networksourcedata")
+				                .source(convertObjectToMap(model),XContentType.JSON);
+
+							IndexResponse indexResponse = restClient.index(indexRequest, RequestOptions.DEFAULT);
+							LOGGER.info("index response{}",indexResponse.getResult().name());
+									
+					}
+
+				}
+
+				/*
+				 * NetworkProcessServiceActivity networkProcessServiceActivity = new
+				 * NetworkProcessServiceActivity();
+				 * networkProcessServiceActivity.setNetworkDataProcessActivity(
+				 * networkDataProcessActivityModel); networkProcessServiceActivity
+				 * .setActivity(NetworkProcessServiceActivity.Type.NETWORK_DATA_SOURCING.
+				 * getValue());
+				 * networkDataProcessActivityEventService.processNetworkProcessActivity(
+				 * networkProcessServiceActivity);
+				 */
+				
+
+			}
+
+		} catch (Exception e) {
+			handleMethodException(e, methodName, null);
+		}
+
+		return returnValue;
+	}
+	
+	private Map<String, Object> convertObjectToMap(NetworkDataSourcingModel model) {
+		return objectMapper.convertValue(model, Map.class);
+	}
+
+	/**
+	 * Creates the network data process activity model.
+	 *
+	 * @return the network data process activity model
+	 */
+	private NetworkDataProcessActivityModel createNetworkDataProcessActivityModel() {
+		NetworkDataProcessActivityModel returnValue = null;
+		
+		NetworkDataProcessActivityKey processActivityKey = new NetworkDataProcessActivityKey();
+
+		// TODO
+		// need to get the client from configured source
+		processActivityKey.setClient("KRYPTOBLOCKS");
+		processActivityKey.setDataCenter("KRYPTOBLOCKS_DATA_CENTER");
+		processActivityKey.setRountingIdentifier("KRYPTOBLOCKS_ROUTER");
+		processActivityKey.setTimeStamp(DateType.DATE_FORMAT_WITH_NANO_SECONDS.getValue());
+
+		returnValue = new NetworkDataProcessActivityModel();
+		returnValue
+				.setActivityType(NetworkProcessServiceActivity.Type.NETWORK_DATA_SOURCING.getValue());
+		returnValue.setStartTime(DateType.DATE_FORMAT_WITH_NANO_SECONDS.getValue());
+		returnValue.setKey(processActivityKey);
+		return returnValue;
+		
+	}
+	
+
+	/**
+	 * Formalize network data sourcing model.
+	 *
+	 * @param sourcingInput the sourcing input
+	 * @return the network data sourcing model
+	 */
+	private NetworkDataSourcingModel formalizeNetworkDataSourcingModel(Object sourcingInput) {
+		NetworkDataSourcingModel returnValue = new NetworkDataSourcingModel();
+		return returnValue;
+
+	}
+	
+	/**
+	 * Handle method exception.
+	 *
+	 * @param e the e
+	 * @param methodName the method name
+	 * @param message the message
+	 * @throws BusinessException the business exception
+	 */
+	private void handleMethodException(Exception e, String methodName, String message) throws BusinessException {
+		String exceptionMsg = ExceptionUtils.getFullStackTrace(e);
+		LOGGER.debug("exception in {} business method: exception details are: {}", methodName, exceptionMsg);
+		throw new BusinessException(exceptionMsg);
+	}
+	
+
+}

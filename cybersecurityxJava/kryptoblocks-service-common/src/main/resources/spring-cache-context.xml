@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:gfe="http://www.springframework.org/schema/gemfire"
+	xmlns:gfe-data="http://www.springframework.org/schema/data/gemfire"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/gemfire http://www.springframework.org/schema/gemfire/spring-gemfire.xsd
+	 					   http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/jms 
+                           http://www.springframework.org/schema/jms/spring-jms.xsd
+                           http://activemq.apache.org/schema/core 
+                           http://activemq.apache.org/schema/core/activemq-core.xsd
+                           http://www.springframework.org/schema/util 
+                           http://www.springframework.org/schema/util/spring-util.xsd
+                           http://www.springframework.org/schema/data/gemfire 
+                           http://www.springframework.org/schema/data/gemfire/spring-data-gemfire.xsd">
+	
+	
+	<!-- data cache custom properties -->
+	<util:properties id="cacheConfigProperties"
+		location="classpath:/cache-config.properties" />
+
+	<!-- data cache  server random port generator-->	
+	<bean id="portGenerator"
+			class="io.kryptoblocks.msa.common.cache.repository.CacheServerPortGenerator" />
+   
+	<!-- data cache PDX  serializer-->	
+	<bean id="pdxSerializer" class="com.gemstone.gemfire.pdx.ReflectionBasedAutoSerializer">
+		<constructor-arg>
+			<list value-type="java.lang.String">
+				<value> ${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.DOMAIN.MODEL.PACKAGE}</value>						
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<!-- data cache -->	
+	<gfe:cache id="dataCache" properties-ref="cacheConfigProperties"	pdx-serializer-ref="pdxSerializer"   
+		close="${smartride.data.cache.close.indicator}"		
+		copy-on-read="${smartride.data.cache.copy.on.read}"
+		critical-heap-percentage="${smartride.data.cache.critical.heap.percentage}"
+		eviction-heap-percentage="${smartride.data.cache.eviction.heap.percentage}"
+		enable-auto-reconnect="${smartride.data.cache.enable.auto.correct}"
+		lock-lease="${smartride.data.cache.lock.lease}"
+		lock-timeout="${smartride.data.cache.lock.timeout}"
+		message-sync-interval="${smartride.data.cache.message.sync.interval}"
+		pdx-persistent="${smartride.data.cache.pdx.persistent}"
+		pdx-read-serialized="${smartride.data.cache.pdx.read.serialized}"
+		pdx-ignore-unread-fields="${smartride.data.cache.pdx.ignore.unread.fields}"
+		search-timeout="${smartride.data.cache.search.timeout}"
+		use-cluster-configuration="${smartride.data.cache.use.cluster.configuration}"
+	 />		 
+
+	<!-- data cache server -->
+	<gfe:cache-server id="dataCacheServer"
+		auto-startup="${smartride.data.cache.server.auto.startup}"
+		bind-address="${smartride.data.cache.server.bind.address}"
+		port="#{portGenerator.generatePort(40404,40604)}"	
+		host-name-for-clients="${smartride.data.cache.server.host.for.clients}"
+		load-poll-interval="${smartride.data.cache.server.lock.poll.interval}"
+		max-connections="${smartride.data.cache.server.max.connections}"
+		max-threads="${smartride.data.cache.server.max.threads}"
+		max-message-count="${smartride.data.cache.server.max.message.count}"
+		max-time-between-pings="${smartride.data.cache.server.max.time.between.pings}"
+		groups="${smartride.data.cache.server.groups}"
+		cache-ref="dataCache">
+	</gfe:cache-server>
+
+	<!-- data cache log listener -->
+	<bean id="dataCacheLoggingListener" name="dataCacheLoggingListener"
+		class="io.kryptoblocks.msa.common.cache.repository.CacheSyncEventListener" />
+
+	<!-- data cache a-sync event queue -->
+	<gfe:async-event-queue id="dataCacheAsyncEventQueue"
+		name="dataCacheAsyncEventQueue" cache-ref="dataCache"
+		batch-size="${smartride.data.cache.async.event.queue.batch.size}" 
+		persistent="${smartride.data.cache.async.event.queue.persistent}" 
+		parallel="${smartride.data.cache.async.event.queue.parallel}" 
+		disk-synchronous="${smartride.data.cache.async.event.queue.disk-synchronous}"		
+		disk-store-ref="dataCacheQueueStore"
+		maximum-queue-memory="${smartride.data.cache.async.event.queue.max.queue.memory}" 
+		dispatcher-threads="${smartride.data.cache.async.event.queue.dispatcher.threads}">
+		<gfe:async-event-listener>
+			<bean class="io.kryptoblocks.msa.common.cache.repository.CacheAsyncEventListener" />
+		</gfe:async-event-listener>
+	</gfe:async-event-queue>
+
+	<!-- data cache queue store -->
+	<gfe:disk-store id="dataCacheQueueStore"
+		cache-ref="dataCache"
+		queue-size="${smartride.data.cache.disk.store.queue.size}" 
+		auto-compact="${smartride.data.cache.disk.store.auto.compact}" 
+		max-oplog-size="${smartride.data.cache.disk.store.max.operation.log.size}" 
+		time-interval="${smartride.data.cache.disk.store.time.interval}">
+		<gfe:disk-dir location="${smartride.data.cache.disk.store.primary.location}" 
+			max-size="${smartride.data.cache.disk.store.primary.location.size}"  />
+		<gfe:disk-dir location="${smartride.data.cache.disk.store.secondary.location}" 
+			max-size="${smartride.data.cache.disk.store.secondary.location.size}"/>
+	</gfe:disk-store>
+	
+	
+	<!-- rid mgmt bid partitioned store -->
+	<gfe:disk-store id="ridMgmtBidPartitionedStore"
+		cache-ref="dataCache" 
+		queue-size="${smartride.data.cache.disk.store.queue.size}" 
+		auto-compact="${smartride.data.cache.disk.store.auto.compact}" 
+		max-oplog-size="${smartride.data.cache.disk.store.max.operation.log.size}" 
+		time-interval="${smartride.data.cache.disk.store.time.interval}">
+        <gfe:disk-dir location="${smartride.data.cache.ride.mgmt.bid.partitioned.region.disk.store.primary.location}" 
+        	max-size="${smartride.data.cache.ride.mgmt.bid.partitioned.region.disk.store.primary.location.size}"/>
+        <gfe:disk-dir location="${smartride.data.cache.ride.mgmt.bid.partitioned.region.disk.store.secondary.location}" 
+        max-size="${smartride.data.cache.ride.mgmt.bid.partitioned.region.disk.store.secondary.location.size}"/>
+    </gfe:disk-store> 
+    
+    <!-- ride mgmt bid replicated store -->
+    <gfe:disk-store id="ridMgmtBidReplicatedStore"
+		cache-ref="dataCache" 
+		queue-size="${smartride.data.cache.disk.store.queue.size}" 
+		auto-compact="${smartride.data.cache.disk.store.auto.compact}" 
+		max-oplog-size="${smartride.data.cache.disk.store.max.operation.log.size}" 
+		time-interval="${smartride.data.cache.disk.store.time.interval}">
+        <gfe:disk-dir location="${smartride.data.cache.ride.mgmt.bid.replicated.region.disk.store.primary.location}" 
+        	max-size="${smartride.data.cache.ride.mgmt.bid.replicated.region.disk.store.primary.location.size}"/>
+        <gfe:disk-dir location="${smartride.data.cache.ride.mgmt.bid.replicated.region.disk.store.secondary.location}" 
+        max-size="${smartride.data.cache.ride.mgmt.bid.replicated.region.disk.store.secondary.location.size}"/>
+    </gfe:disk-store> 
+	
+	<!-- ride mgmt bid partitioned region -->
+	<gfe:partitioned-region id="ridMgmtBidPartitionedRegion" 
+		name="ridMgmtBidPartitionedRegion"
+		persistent="true" 			
+		cache-ref="dataCache"
+		copies="2" 		 
+		recovery-delay="60000"
+		disk-store-ref="ridMgmtBidPartitionedStore">	
+		<gfe:async-event-queue-ref bean="dataCacheAsyncEventQueue"/>    	 				
+		<!-- <gfe:cache-listener ref="dataCacheLoggingListener"/>	-->
+		<!-- <gfe:eviction type="MEMORY_SIZE" threshold="1024" action="OVERFLOW_TO_DISK"/> -->
+	</gfe:partitioned-region>
+	
+	<!-- ride mgmt bid replicated region -->
+	<gfe:replicated-region id="ridMgmtBidReplicatedRegion" 
+		name="ridMgmtBidReplicatedRegion"
+		persistent="true" 
+		cache-ref="dataCache"
+		disk-store-ref="ridMgmtBidReplicatedStore">	
+		<gfe:async-event-queue-ref bean="dataCacheAsyncEventQueue"/> 		
+		<!-- <gfe:cache-listener ref="dataCacheLoggingListener" />	-->
+		<gfe:eviction type="MEMORY_SIZE" threshold="1024" action="OVERFLOW_TO_DISK"/>
+	</gfe:replicated-region>
+	
+	
+	<!-- ride mgmt bid partitioned  region template -->
+	<bean id="ridMgmtBidPartitionedRegionTemplate" name="ridMgmtBidPartitionedRegionTemplate"
+		class="org.springframework.data.gemfire.GemfireTemplate">
+		<constructor-arg ref="ridMgmtBidPartitionedRegion" />
+	</bean>
+	
+	<!-- ride mgmt bid replicated  region template -->
+	<bean id="ridMgmtBidReplicatedRegionTemplate" name="ridMgmtBidReplicatedRegionTemplate"
+		class="org.springframework.data.gemfire.GemfireTemplate">
+		<constructor-arg ref="ridMgmtBidReplicatedRegion" />
+	</bean>
+	
+	<!-- rid mgmt execution partitioned data store-->
+	
+	<gfe:disk-store id="rideMgmtExecutionPartitionedStore"
+		cache-ref="dataCache" 
+		queue-size="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.DISK.STORE.QUEUE.SIZE}" 
+		auto-compact="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.DISK.STORE.AUTO.COMPACT}" 
+		max-oplog-size="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.DISK.STORE.MAX.OPERATION.LOG.SIZE}" 
+		time-interval="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.DISK.STORE.TIME.INTERVAL}">
+        <gfe:disk-dir location="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.TASK.EVENT.REGION.PARTITIONED.DISK.STORE.PRIMARY.LOCATION}" 
+        	max-size="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.TASK.EVENT.REGION.PARTITIONED.DISK.STORE.PRIMARY.LOCATION.SIZE}"/>
+        <gfe:disk-dir location="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.TASK.EVENT.REGION.PARTITIONED.DISK.STORE.SECONDARY.LOCATION}" 
+        	max-size="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.TASK.EVENT.REGION.PARTITIONED.DISK.STORE.SECONDARY.LOCATION.SIZE}"/>
+    </gfe:disk-store> 
+    
+    <!-- rid mgmt execution replicated data store-->
+    <gfe:disk-store id="rideMgmtExecutionReplicatedStore"
+		cache-ref="dataCache" 
+		queue-size="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.DISK.STORE.QUEUE.SIZE}" 
+		auto-compact="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.DISK.STORE.AUTO.COMPACT}" 
+		max-oplog-size="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.DISK.STORE.MAX.OPERATION.LOG.SIZE}" 
+		time-interval="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.DISK.STORE.TIME.INTERVAL}">
+        <gfe:disk-dir location="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.TASK.EVENT.REGION.REPLICATED.DISK.STORE.PRIMARY.LOCATION}" 
+        	max-size="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.TASK.EVENT.REGION.REPLICATED.DISK.STORE.PRIMARY.LOCATION.SIZE}"/>
+        <gfe:disk-dir location="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.TASK.EVENT.REGION.REPLICATED.DISK.STORE.SECONDARY.LOCATION}" 
+        	max-size="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.TASK.EVENT.REGION.REPLICATED.DISK.STORE.SECONDARY.LOCATION.SIZE}"/>
+    </gfe:disk-store> 
+	
+	<!-- rid mgmt execution partitioned region -->
+	<gfe:partitioned-region id="rideMgmtExecutionPartitionedRegion" 
+		name="rideMgmtExecutionPartitionedRegion"
+		persistent="true" 
+		cache-ref="dataCache"
+		copies="2" 		 
+		recovery-delay="60000"
+		disk-store-ref="rideMgmtExecutionPartitionedStore">			
+		<gfe:cache-listener ref="dataCacheLoggingListener" />	
+		<gfe:eviction type="MEMORY_SIZE" threshold="1024" action="OVERFLOW_TO_DISK"/>
+	</gfe:partitioned-region>
+	
+	<!-- rid mgmt execution replicated region -->
+	<gfe:partitioned-region id="rideMgmtExecutionReplicatedRegion"
+		name="rideMgmtExecutionReplicatedRegion"
+		persistent="true" 
+		cache-ref="dataCache"
+		copies="2" 		 
+		recovery-delay="60000"
+		disk-store-ref="rideMgmtExecutionReplicatedStore">			
+		<gfe:cache-listener ref="dataCacheLoggingListener" />	
+		<gfe:eviction type="MEMORY_SIZE" threshold="1024" action="OVERFLOW_TO_DISK"/>
+	</gfe:partitioned-region>
+	
+	<!-- rid mgmt execution partitioned region template -->
+	<bean id="rideMgmtExecutionPartitionedRegionTemplate" name="rideMgmtExecutionPartitionedRegionTemplate"
+		class="org.springframework.data.gemfire.GemfireTemplate">
+		<constructor-arg ref="rideMgmtExecutionPartitionedRegion" />
+	</bean>
+	
+	<!-- rid mgmt execution replicated region template -->
+	<bean id="rideMgmtExecutionReplicatedRegionTemplate" name="rideMgmtExecutionReplicatedRegionTemplate"
+		class="org.springframework.data.gemfire.GemfireTemplate">
+		<constructor-arg ref="rideMgmtExecutionReplicatedRegion" />
+	</bean>
+		
+	<gfe:pool id="locatorPool" subscription-enabled="true">
+     	<gfe:locator host="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.CACHE.LOCATOR.HOST}" 
+     				 port="${COM.SMARTRIDE.DATA.GEMFIRE.CACHE.LOCATOR.PORT}"/>
+ 	</gfe:pool>
+		
+	
+	
+	<!-- data cache function -->
+	<bean id="cacheFunction" name="cacheFunction"
+		class="io.kryptoblocks.msa.common.cache.function.CacheFuction">		
+	</bean>
+	
+	<!-- data cache function service -->
+	<gfe:function-service>
+    	<gfe:function ref="cacheFunction"/>
+    </gfe:function-service>
+    
+
+	 
+
+</beans>

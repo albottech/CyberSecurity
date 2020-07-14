@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<include resource="org/springframework/boot/logging/logback/base.xml" />
+	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+	<property resource="application.properties"/>
+	<!-- You can override this to have a custom pattern -->
+	<property name="CONSOLE_LOG_PATTERN"
+			  value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+	
+	
+    
+    <!-- 
+    <appender name="microsoftAIAppender" 
+      class="com.microsoft.applicationinsights.logback.ApplicationInsightsAppender">
+   	</appender>  -->
+   	
+   	<springProperty scope="context" name="logPathTextFileLocation" source="log.path.text.file.location" defaultValue="/log/"/>
+   	<springProperty scope="context" name="logPathJsonFileLocation" source="log.path.json.file.location" defaultValue="/log/"/>   	
+   	<springProperty scope="context" name="logPathTextFileName" source="log.path.text.file.name" defaultValue="security-service-txt-log.txt"/>
+   	<springProperty scope="context" name="logPathJsonFileName" source="log.path.json.file.name" defaultValue="security-service-json-log.json"/>
+   	<springProperty scope="context" name="serviceName" source="spring.application.name" defaultValue="unKnownServiceName"/>
+   	
+   	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+   	 <resetJUL>true</resetJUL>
+	</contextListener>
+   	
+   
+    <appender name="fileTxtAppender" class="ch.qos.logback.core.rolling.RollingFileAppender"> 
+      	 
+      	<file> ${logPathTextFileLocation} + ${logPathTextFileName} </file>
+      <encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder>
+      <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <maxIndex>1</maxIndex>
+            <fileNamePattern>${logPathTextFileLocation} +    ${logPathTextFileName}.%i</fileNamePattern>
+      </rollingPolicy>
+      <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+      </triggeringPolicy>
+   </appender>
+    
+    <appender name="fileJsonAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logPathJsonFileLocation} + ${logPathJsonFileName}</File>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <maxIndex>1</maxIndex>
+            <fileNamePattern>${logPathJsonFileLocation} +  ${logPathJsonFileName}.%i</fileNamePattern>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+			<providers>
+				<timestamp>
+					<timeZone>UTC</timeZone>
+				</timestamp>
+				<pattern>
+					<pattern>
+						{
+						"severity": "%level",
+						"service": "${springAppName:-}",
+						"trace": "%X{X-B3-TraceId:-}",
+						"span": "%X{X-B3-SpanId:-}",
+						"parent": "%X{X-B3-ParentSpanId:-}",
+						"exportable": "%X{X-Span-Export:-}",
+						"pid": "${PID:-}",
+						"thread": "%thread",
+						"class": "%logger{40}",
+						"rest": "%message"
+						}
+					</pattern>
+				</pattern>
+			</providers>
+		</encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+    
+    <appender name="consoleJsonAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+    
+    <appender name="consoleDefaultAppender" class="ch.qos.logback.core.ConsoleAppender">        
+      <filter class="ch.qos.logback.classic.filter.LevelFilter"> 
+         <level>DEBUG</level> 
+         <onMatch>ACCEPT</onMatch> 
+         <onMismatch>DENY</onMismatch> 
+      </filter>   
+      <encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder> 
+   </appender>
+   
+   <appender name="amqpAppender"
+        class="org.springframework.amqp.rabbit.logback.AmqpAppender">
+        <host>${service.amqp.host}</host>
+        <port>${service.amqp.port}</port>
+        <virtualHost>/</virtualHost>
+        <username>${service.amqp.username}</username>
+        <password>${service.amqp.password}</password>
+        <exchangeType>${service.amqp.log.exchange.type}</exchangeType>
+        <exchangeName>${service.amqp.log.exchange.name}</exchangeName>
+        <declareExchange>true</declareExchange>
+        <applicationId>${service.amqp.log.exchange.application.id}</applicationId>
+        <!--  <routingKeyPattern>%c.%p</routingKeyPattern> -->
+        <routingKeyPattern>${service.amqp.log.exchange.routing.key.pattern}</routingKeyPattern>
+        <generateId>true</generateId>
+        <contentType>${service.amqp.log.exchange.content.type}</contentType>
+        <durable>true</durable>
+    	<deliveryMode>${service.amqp.log.exchange.delivery.mode}</deliveryMode>
+        <charset>UTF-8</charset>
+        <layout>
+            <pattern><![CDATA[ %d %p %t [%c] - <%m>%n ]]></pattern>
+        </layout>
+    </appender>
+     
+     <logger name="com.metlife.msa" level="debug" /> 
+    
+    
+        
+   
+    <root level="info">         
+         <appender-ref ref="fileJsonAppender"/>
+         <appender-ref ref="fileTxtAppender"/> 
+         <appender-ref ref="consoleDefaultAppender"/> 
+         <!-- <appender-ref ref="amqpAppender"/>  -->
+         <!--  <appender-ref ref="microsoftAIAppender"/>  -->                        
+    </root>   
+    
+</configuration>
